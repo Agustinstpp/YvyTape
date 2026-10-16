@@ -249,8 +249,8 @@ describe("Reglas de Negocio y Ciclo Comercial YvyPass", () => {
     });
 
     it("17. Un productor no puede confirmar en nombre de otro productor", () => {
-      const currentUserId = "prod-a";
-      const targetProducerId = "prod-b";
+      const currentUserId: string = "prod-a";
+      const targetProducerId: string = "prod-b";
 
       expect(() => {
         if (currentUserId !== targetProducerId) {

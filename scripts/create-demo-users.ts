@@ -149,7 +149,7 @@ async function seedDemoUsers() {
 
       if (userId) {
         // 2. Sincronizar en profiles con rol elevado
-        const { error: profileError } = await supabaseAdmin.from("profiles").upsert({
+        const { error: profileError } = await (supabaseAdmin.from("profiles") as any).upsert({
           id: userId,
           full_name: userDef.fullName,
           role: userDef.role,
