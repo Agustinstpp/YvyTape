@@ -248,3 +248,48 @@ a.card { text-decoration: none; color: var(--negro); }
 @media (min-width: 960px) {
   .page { max-width: 880px; }
 }
+
+/* Landing: recorrido de la hacienda (camino de tierra con paradas) */
+.ruta { list-style: none; margin: 0; padding: 0 0 0 8px; display: flex; flex-direction: column; gap: 18px; position: relative; }
+.ruta::before {
+  content: ""; position: absolute; left: 39px; top: 30px; bottom: 30px; width: 14px; border-radius: 8px;
+  background: repeating-linear-gradient(to bottom, var(--marron) 0 18px, var(--amarillo) 18px 26px);
+}
+.ruta-paso { position: relative; padding-left: 80px; min-height: 64px; display: flex; flex-direction: column; gap: 2px; }
+.ruta-marca {
+  position: absolute; left: 0; top: 0; width: 64px; height: 64px; border-radius: 999px;
+  background: var(--blanco); border: 3px solid var(--naranja); display: flex; align-items: center; justify-content: center; z-index: 1;
+}
+.ruta-num {
+  position: absolute; left: 44px; top: -4px; z-index: 2; width: 24px; height: 24px; border-radius: 999px;
+  background: var(--amarillo); color: var(--negro); font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+}
+.ruta-cat { font-weight: 700; color: var(--naranja-hover); font-size: 15px; }
+.ruta-yvy { margin-top: 4px; background: var(--crema-fuerte); border-left: 4px solid var(--amarillo); padding: 6px 10px; border-radius: 6px; font-size: 15px; }
+@media (min-width: 900px) {
+  .ruta { flex-direction: row; padding: 0; gap: 14px; }
+  .ruta::before {
+    left: 6%; right: 6%; top: 25px; bottom: auto; width: auto; height: 14px;
+    background: repeating-linear-gradient(to right, var(--marron) 0 22px, var(--amarillo) 22px 32px);
+  }
+  .ruta-paso { flex: 1; padding: 80px 0 0; align-items: center; text-align: center; }
+  .ruta-marca { left: 50%; transform: translateX(-50%); }
+  .ruta-num { left: calc(50% + 18px); }
+  .ruta-yvy { text-align: left; }
+}
+
+/* Completá la venta: mapa de cercanos */
+.cerca-mapa { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.cerca-mapa svg { display: block; border-radius: 18px; border: 2px solid var(--borde); }
+.cerca-txt { font: 700 14px "Atkinson Hyperlegible Next", system-ui, sans-serif; fill: var(--negro); paint-order: stroke; stroke: #f3e7cc; stroke-width: 4px; }
+.cerca-badge { font: 800 14px "Atkinson Hyperlegible Next", system-ui, sans-serif; }
+.cerca-num { flex: none; width: 44px; height: 44px; border-radius: 999px; background: var(--blanco); border: 3px solid var(--naranja); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; }
+.invitar-form { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+/* Animaciones compartidas (completar la venta) */
+.mapa-linea { animation: mapa-flujo 1.2s linear infinite; }
+@keyframes mapa-flujo { to { stroke-dashoffset: -14; } }
+.mapa-ley { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 15px; font-weight: 700; justify-content: center; }
+.mapa-ley span { display: inline-flex; align-items: center; gap: 6px; }
+.ley-dot { width: 16px; height: 16px; border-radius: 999px; border: 2px solid var(--marron); display: inline-block; }
+@media (prefers-reduced-motion: reduce) { .mapa-anim { display: none; } }
