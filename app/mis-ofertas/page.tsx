@@ -25,7 +25,8 @@ export default async function MisOfertasPage() {
           <Link href="/ofertas">Ver ofertas</Link>
         </Empty>
       ) : (
-        ventas.map((v) => {
+        <div className="lista">
+        {ventas.map((v) => {
           const o = v.active_offer!;
           const estado = v.status === "cerrado" ? ESTADO.aceptada : ESTADO[o.status];
           const productores = new Set(v.members.map((m) => m.lot?.producer_id)).size;
@@ -45,7 +46,8 @@ export default async function MisOfertasPage() {
               </span>
             </Link>
           );
-        })
+        })}
+        </div>
       )}
     </AppShell>
   );

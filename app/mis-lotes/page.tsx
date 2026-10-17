@@ -58,14 +58,16 @@ export default async function MisLotesPage() {
           <p className="small">Cargá el primero y te mostramos ventas conjuntas cerca tuyo.</p>
         </Empty>
       ) : (
-        activos.map((l) => <Tarjeta key={l.id} lote={l} />)
+        <div className="lista">{activos.map((l) => <Tarjeta key={l.id} lote={l} />)}</div>
       )}
       {vendidos.length > 0 ? (
         <>
           <h2 style={{ marginTop: 8 }}>Vendidos</h2>
-          {vendidos.map((l) => (
-            <Tarjeta key={l.id} lote={l} />
-          ))}
+          <div className="lista">
+            {vendidos.map((l) => (
+              <Tarjeta key={l.id} lote={l} />
+            ))}
+          </div>
         </>
       ) : null}
     </AppShell>

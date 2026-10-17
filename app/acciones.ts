@@ -6,7 +6,7 @@
  */
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { createFarm, getMyFarms } from "@/features/auth/queries";
 import { createLot } from "@/features/lots/mutations";
 import { createPool, joinPool, leavePool } from "@/features/pools/mutations";
@@ -22,12 +22,42 @@ const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const num = (fd: FormData, k: string) => parseNumero(str(fd, k));
 
 // ------------------------------------------------------------------ sesión
+/**
+ * Demo sin verificación de correo: si hay SUPABASE_SERVICE_ROLE_KEY en el servidor, las cuentas se crean
+ * ya confirmadas y se destraban las que quedaron esperando el mail. Sin esa clave se usa el flujo normal.
+ * TODO(producción): volver a pedir confirmación de correo.
+ */
+function admin() {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
+  try {
+    return createAdminClient();
+  } catch {
+    return null;
+  }
+}
+
+async function confirmarCorreo(email: string): Promise<boolean> {
+  const a = admin();
+  if (!a) return false;
+  for (let page = 1; page <= 10; page++) {
+    const { data, error } = await a.auth.admin.listUsers({ page, perPage: 200 });
+    if (error || !data?.users.length) return false;
+    const u = data.users.find((x) => x.email?.toLowerCase() === email.toLowerCase());
+    if (u) return !(await a.auth.admin.updateUserById(u.id, { email_confirm: true })).error;
+    if (data.users.length < 200) return false;
+  }
+  return false;
+}
+
 export async function ingresar(_: FormState, fd: FormData): Promise<FormState> {
   const email = str(fd, "email");
   const password = str(fd, "password");
   if (!email || !password) return { error: "Completá tu correo y tu contraseña." };
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  let { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error && /confirm/i.test(`${error.code ?? ""} ${error.message}`) && (await confirmarCorreo(email))) {
+    ({ error } = await supabase.auth.signInWithPassword({ email, password }));
+  }
   if (error) return { error: "El correo o la contraseña no coinciden. Revisalos y probá de nuevo." };
   const perfil = await getSessionProfile();
   redirect(perfil ? homeFor(perfil.role) : "/inicio");
@@ -50,13 +80,27 @@ export async function registrarse(_: FormState, fd: FormData): Promise<FormState
   //   El trigger handle_new_user debería aceptar solo productor/comprador.
   const supabase = await createClient();
   // No se pide teléfono: toda la comunicación queda dentro de YvyTape.
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { full_name, zone, role } },
-  });
-  if (error) return { error: "No pudimos crear la cuenta. Puede que ese correo ya esté registrado." };
-  if (!data.session) return { ok: "Te mandamos un correo para confirmar la cuenta. Abrilo y después entrá." };
+  const a = admin();
+  if (a) {
+    // Cuenta creada ya confirmada: entra directo, sin mail.
+    const { error } = await a.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { full_name, zone, role },
+    });
+    if (error) return { error: "No pudimos crear la cuenta. Puede que ese correo ya esté registrado." };
+    const { error: e2 } = await supabase.auth.signInWithPassword({ email, password });
+    if (e2) return { error: "La cuenta se creó, pero no pudimos ingresar. Probá desde Ingresar." };
+  } else {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name, zone, role } },
+    });
+    if (error) return { error: "No pudimos crear la cuenta. Puede que ese correo ya esté registrado." };
+    if (!data.session) return { ok: "Te mandamos un correo para confirmar la cuenta. Abrilo y después entrá." };
+  }
   redirect(role === "comprador" ? "/ofertas" : "/inicio");
 }
 

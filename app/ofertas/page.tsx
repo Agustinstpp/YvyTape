@@ -79,6 +79,7 @@ export default async function OfertasPage({
         </Empty>
       ) : null}
 
+      <div className="lista">
       {ventas.map((p) => (
         <Link key={p.id} href={`/ventas-conjuntas/${p.id}`} className="card">
           <SaleSeal kind="conjunta" producers={p.members_count} />
@@ -108,6 +109,8 @@ export default async function OfertasPage({
           </span>
         </Link>
       ))}
+
+      </div>
 
       {!perfil ? (
         <Link href="/registrarse?rol=comprador" className="btn btn-p">

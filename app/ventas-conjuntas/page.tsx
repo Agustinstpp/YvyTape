@@ -61,7 +61,8 @@ export default async function VentasPage({
           <p className="small">Podés armar una nueva y te avisamos cuando otros productores se sumen.</p>
         </Empty>
       ) : (
-        lista.map((p) => (
+        <div className="lista">
+        {lista.map((p) => (
           <Link key={p.id} href={`/ventas-conjuntas/${p.id}`} className="card">
             <h2 style={{ fontSize: 19 }}>{p.title}</h2>
             <span className="small" style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -74,7 +75,8 @@ export default async function VentasPage({
               {participo.has(p.id) ? <span className="tag" style={{ background: "var(--naranja)" }}>Participás</span> : null}
             </div>
           </Link>
-        ))
+        ))}
+        </div>
       )}
 
       <Link href="/mapa" className="btn btn-s">
