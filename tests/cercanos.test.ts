@@ -67,3 +67,20 @@ describe("lotesQueEntran (productor que completa una venta)", () => {
     expect(lotesQueEntran({ ...(pool as object), status: "objetivo_alcanzado" } as never, [l("a", 10)])).toEqual([]);
   });
 });
+
+import { estadoNegociacion } from "@/lib/front/derivados";
+describe("venta lista para cerrar (martillero)", () => {
+  const pool = (conf: { producer_id: string; accepted: boolean }[]) =>
+    ({
+      status: "en_negociacion",
+      members: [{ lot: { producer_id: "a" } }, { lot: { producer_id: "b" } }, { lot: { producer_id: "a" } }],
+      active_offer: { status: "pendiente", confirmations: conf },
+    }) as never;
+  it("cuenta productores únicos y avisa cuando aceptaron todos", () => {
+    expect(estadoNegociacion(pool([{ producer_id: "a", accepted: true }]))).toMatchObject({ aceptaron: 1, productores: 2, lista: false });
+    expect(estadoNegociacion(pool([{ producer_id: "a", accepted: true }, { producer_id: "b", accepted: true }]))?.lista).toBe(true);
+  });
+  it("no aplica si la venta no está en negociación", () => {
+    expect(estadoNegociacion({ status: "abierto", members: [], active_offer: null } as never)).toBeNull();
+  });
+});
