@@ -57,7 +57,7 @@ export async function AppShell({ title, subtitle, back, perfil, current, childre
   const items = perfil ? NAV[perfil.role] : [];
 
   return (
-    <div className="app">
+    <div className={items.length > 0 ? "app con-menu" : "app"}>
       <header className="topbar">
         {back ? (
           <Link href={back.href} className="icon-btn" aria-label={back.label}>
@@ -78,6 +78,10 @@ export async function AppShell({ title, subtitle, back, perfil, current, childre
           aria-label="Menú"
           style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)` }}
         >
+          <Link href="/" className="nav-brand" aria-label="YvyTape, inicio">
+            <Logo size={34} />
+            YvyTape
+          </Link>
           {items.map(({ key, href, label, Icon }) => {
             const showBadge = key === "mensajes" && unread > 0;
             return (
