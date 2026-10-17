@@ -28,9 +28,15 @@ export default async function MisOfertasPage() {
         <div className="lista">
         {ventas.map((v) => {
           const o = v.active_offer!;
-          const estado = v.status === "cerrado" ? ESTADO.aceptada : ESTADO[o.status];
           const productores = new Set(v.members.map((m) => m.lot?.producer_id)).size;
-          const aceptaron = o.confirmations?.filter((c) => c.accepted).length ?? 0;
+          const aceptaron = new Set((o.confirmations ?? []).filter((c) => c.accepted).map((c) => c.producer_id)).size;
+          const enRevision = v.status === "en_negociacion" && o.status === "pendiente" && productores > 0 && aceptaron >= productores;
+          const estado =
+            v.status === "cerrado"
+              ? { label: "Aceptada: cerrada por el martillero", cls: "tag-ok" }
+              : enRevision
+                ? { label: "Aceptaron todos: en revisión del martillero", cls: "tag-pendiente" }
+                : ESTADO[o.status];
           return (
             <Link key={v.id} href={`/ventas-conjuntas/${v.id}`} className="card">
               <h2 style={{ fontSize: 19 }}>{v.title}</h2>

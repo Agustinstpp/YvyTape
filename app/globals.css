@@ -11,17 +11,17 @@
   --negro: #1a1a1a;
   --texto-suave: #3d332b;
   --texto-apoyo: #5c4e44;
-  --crema: #fff8ec;
-  --crema-fuerte: #fdf0d2;
+  --crema: #faf7f3;
+  --crema-fuerte: #f1ebe3;
   --blanco: #ffffff;
-  --borde: #eadbc4;
+  --borde: #e6ddd2;
   --borde-campo: #8c7a6b;
   --exito-fondo: #ddefd6;
   --exito: #1f5a22;
   --error-fondo: #fbe4e1;
   --error: #b3261e;
-  --pendiente-fondo: #fff0b8;
-  --pendiente: #4a3a00;
+  --pendiente-fondo: #fde6d2;
+  --pendiente: #6b3e26;
   --radio: 14px;
 }
 
@@ -84,7 +84,7 @@ p { margin: 0; }
   background: var(--blanco); border: 2px solid var(--borde); border-radius: 18px;
   padding: 18px; display: flex; flex-direction: column; gap: 10px;
 }
-.card.highlight { background: var(--amarillo); border-color: var(--amarillo); color: var(--negro); }
+.card.highlight { background: var(--blanco); border-color: var(--naranja); color: var(--negro); box-shadow: 0 2px 0 var(--naranja); }
 .card.highlight h2, .card.highlight h3 { color: var(--negro); }
 .card.accent { background: var(--naranja); border-color: var(--naranja); color: var(--negro); }
 .card.note { background: var(--crema-fuerte); border-color: var(--crema-fuerte); }
@@ -118,6 +118,8 @@ a.card { text-decoration: none; color: var(--negro); }
 .btn-s { background: var(--blanco); color: var(--marron); border: 2px solid var(--marron); font-weight: 700; }
 .btn-s:hover { background: var(--crema-fuerte); color: var(--marron); }
 .btn-y { background: var(--amarillo); color: var(--negro); }
+.btn-m { background: var(--marron); color: var(--blanco); }
+.btn-m:hover { background: var(--marron-oscuro); color: var(--blanco); }
 .btn-big { min-height: 60px; font-size: 18px; border-radius: 16px; }
 .btn:disabled { background: #ede7e0; color: #5c5048; border-color: #ede7e0; cursor: not-allowed; }
 .btn-inline { width: auto; min-height: 48px; font-size: 16px; padding: 0 16px; }
@@ -171,7 +173,7 @@ a.card { text-decoration: none; color: var(--negro); }
 .tag-pendiente { background: var(--pendiente-fondo); color: var(--pendiente); }
 .tag-ok { background: var(--exito-fondo); color: var(--exito); }
 .tag-no { background: #ede7e0; color: #5c5048; }
-.tag-declarado { background: var(--blanco); color: var(--pendiente); border: 2px solid #a08a3c; }
+.tag-declarado { background: var(--blanco); color: #5c4a1e; border: 2px solid #a08a3c; }
 .seal-conjunta { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 8px; font-size: 15px; font-weight: 800; background: var(--marron); color: var(--blanco); }
 .seal-individual { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 8px; font-size: 15px; font-weight: 800; background: var(--blanco); color: var(--marron); border: 2px dashed var(--marron); }
 
@@ -242,7 +244,7 @@ a.card { text-decoration: none; color: var(--negro); }
 .land-bar strong { font-size: 20px; }
 .land-faq summary { font-weight: 700; cursor: pointer; min-height: 32px; display: flex; align-items: center; }
 .land-faq[open] summary { margin-bottom: 6px; }
-.land-cta { background: var(--amarillo); }
+.land-cta { background: var(--crema-fuerte); border-top: 2px solid var(--borde); }
 
 
 /* Landing: recorrido de la hacienda (camino de tierra con paradas) */
@@ -335,3 +337,14 @@ a.card { text-decoration: none; color: var(--negro); }
   color: var(--blanco); font: inherit; font-weight: 700; font-size: 16px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
 }
 .salir-btn:hover { background: var(--marron-oscuro); }
+
+/* Etapas de la venta (oferta → productores → martillero → cerrada) */
+.etapas { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.etapa { display: flex; gap: 10px; align-items: flex-start; background: var(--blanco); color: var(--negro); border-radius: 12px; padding: 10px 12px; border: 2px solid var(--borde); }
+.etapa-ico { flex: none; width: 28px; height: 28px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; border: 2px solid var(--borde-campo); background: var(--blanco); }
+.etapa-hecho .etapa-ico { background: var(--exito); border-color: var(--exito); color: var(--blanco); }
+.etapa-actual { border-color: var(--naranja); }
+.etapa-actual .etapa-ico { background: var(--naranja); border-color: var(--naranja); color: var(--negro); }
+.etapa-pendiente { opacity: 0.85; }
+.etapa-tag { font-size: 15px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--crema-fuerte); margin-left: 4px; }
+.etapa-actual .etapa-tag { background: var(--pendiente-fondo); }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSessionProfile } from "@/lib/session";
 import { areZonesCompatible, mismaZona } from "@/lib/front/zonas";
 import { AppShell } from "@/components/app-shell";
+import { EtapasVenta } from "@/components/etapas-venta";
 import { AnswerTag, HeadsProgress, PoolStatusTag } from "@/components/ui";
 import { getPoolDetail } from "@/features/pools/queries";
 import { getMyLots } from "@/features/lots/queries";
@@ -104,6 +105,7 @@ export default async function VentaDetallePage({
           <p>
             De {oferta.buyer?.full_name ?? "un comprador"}. Aceptaron {aceptaron} de {productores.length} productores.
           </p>
+          <EtapasVenta status={venta.status} aceptaron={aceptaron} productores={productores.length} comprador={oferta.buyer?.full_name} />
           {esProductor && misLotesEnVenta.length > 0 && yoRespondi === null ? (
             <Link href={`/ventas-conjuntas/${venta.id}/oferta`} className="btn" style={{ background: "var(--blanco)", color: "var(--negro)" }}>
               Ver la oferta y responder
@@ -114,9 +116,12 @@ export default async function VentaDetallePage({
       ) : null}
 
       {venta.status === "cerrado" && ultimaOferta ? (
-        <p className="alert alert-ok">
-          Venta cerrada a {fmtMoney(Number(ultimaOferta.price_per_kg))} por kg con {ultimaOferta.buyer?.full_name ?? "el comprador"}.
-        </p>
+        <section className="card">
+          <p className="alert alert-ok">
+            Venta cerrada por el martillero a {fmtMoney(Number(ultimaOferta.price_per_kg))} por kg con {ultimaOferta.buyer?.full_name ?? "el comprador"}.
+          </p>
+          <EtapasVenta status={venta.status} aceptaron={productores.length} productores={productores.length} comprador={ultimaOferta.buyer?.full_name} />
+        </section>
       ) : null}
 
       <section className="card rows">

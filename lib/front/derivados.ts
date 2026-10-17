@@ -71,6 +71,14 @@ export async function avisosDelProductor(perfil: Profile): Promise<Aviso[]> {
           href: `/ventas-conjuntas/${pool.id}/oferta`,
           urgente: true,
         });
+      } else if (oferta?.status === "pendiente" && estadoNegociacion(pool)?.lista) {
+        avisos.push({
+          id: `revision-${oferta.id}`,
+          titulo: "Aceptaron todos: el martillero está revisando",
+          texto: `«${pool.title}» a ${fmtMoney(Number(oferta.price_per_kg))} por kg. Te avisamos cuando la cierre.`,
+          href: `/ventas-conjuntas/${pool.id}`,
+          urgente: false,
+        });
       }
     } else if (pool.status === "objetivo_alcanzado") {
       avisos.push({
@@ -84,7 +92,7 @@ export async function avisosDelProductor(perfil: Profile): Promise<Aviso[]> {
       avisos.push({
         id: `cerrada-${pool.id}`,
         titulo: "Venta cerrada",
-        texto: `«${pool.title}» se cerró. El martillero se comunica por Mensajes.`,
+        texto: `«${pool.title}» fue cerrada por el martillero. Te escribe por Mensajes para coordinar.`,
         href: `/ventas-conjuntas/${pool.id}`,
         urgente: false,
       });

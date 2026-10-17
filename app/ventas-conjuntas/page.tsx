@@ -36,7 +36,7 @@ export default async function VentasPage({
     return (
       <Link
         href={`/ventas-conjuntas?ver=${key}${cat ? `&categoria=${cat}` : ""}`}
-        className={`btn btn-inline ${activo ? "btn-y" : "btn-s"}`}
+        className={`btn btn-inline ${activo ? "btn-m" : "btn-s"}`}
         aria-current={activo ? "true" : undefined}
       >
         {label}
