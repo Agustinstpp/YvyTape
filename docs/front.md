@@ -22,6 +22,7 @@ Usuarios de prueba: los de `docs/demo-setup.md` (contraseña `YvyPass2026!`).
 | `/mis-lotes`, `/mis-lotes/nuevo`, `/mis-lotes/guardado` | Productor | Lotes y alta por pasos (crea el establecimiento si hace falta) |
 | `/ventas-conjuntas`, `/ventas-conjuntas/nueva` | Productor | Lista (cerca mío, donde participo, todas) y alta de venta |
 | `/ventas-conjuntas/[id]` | Todos con sesión | Detalle: sumar o sacar lote, ofertar (comprador), cerrar (martillero) |
+| `/ventas-conjuntas/[id]/completar` | Productor y martillero | Mapa de localidades a 50 km con lotes disponibles de la misma categoría e invitación por Mensajes |
 | `/ventas-conjuntas/[id]/oferta` | Productor | Responder la oferta con precio, peso y cobro estimado |
 | `/ofertas`, `/ofertas/lote/[id]` | Comprador y visitantes | Ventas conjuntas y lotes individuales con filtros |
 | `/oferta-enviada`, `/mis-ofertas` | Comprador | Estado de las ofertas |

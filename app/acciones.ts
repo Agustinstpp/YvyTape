@@ -198,6 +198,32 @@ export async function iniciarConsulta(_: FormState, fd: FormData): Promise<FormS
   redirect(`/mensajes/${res.data.id}`);
 }
 
+/**
+ * Invita por mensajería interna a los productores de una o más localidades cercanas a sumarse a la venta.
+ * TODO(backend): la invitación debería llegar al productor dueño de cada lote (hoy queda en la conversación
+ *   de la venta, que coordina el martillero). Y joinPool exige la MISMA zona: para sumar lotes de localidades
+ *   cercanas hace falta que el backend acepte un radio en km.
+ */
+export async function invitarACaravana(_: FormState, fd: FormData): Promise<FormState> {
+  const perfil = await getSessionProfile();
+  if (!perfil) redirect("/ingresar");
+  const poolId = str(fd, "pool_id");
+  const titulo = str(fd, "titulo");
+  const zonas = fd.getAll("zona").map(String).filter(Boolean);
+  const lotes = fd.getAll("lote").map(String).filter(Boolean);
+  if (!zonas.length) return { error: "Elegí a quién invitar." };
+  const res = await mensajes.iniciar(perfil, {
+    poolId,
+    lotId: lotes[0] ?? null,
+    asunto: `Invitación a «${titulo}»`,
+    contexto: `Venta conjunta · ${titulo}`,
+    texto: `Hola: estamos armando la venta conjunta «${titulo}» y nos faltan animales. Hay lotes disponibles en ${zonas.join(", ")}. ¿Quieren sumarse? Respondan por acá y el martillero lo coordina.`,
+  });
+  if (!res.data) return { error: res.error };
+  revalidatePath("/mensajes");
+  return { ok: `Enviamos la invitación a ${zonas.join(", ")} por Mensajes.` };
+}
+
 export async function enviarMensaje(_: FormState, fd: FormData): Promise<FormState> {
   const perfil = await getSessionProfile();
   if (!perfil) redirect("/ingresar");

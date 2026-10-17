@@ -14,6 +14,31 @@ import {
   Logo,
 } from "@/components/icons";
 
+const RUTA = [
+  { titulo: "Campo de cría", categoria: "Terneros y terneras", tamano: 34, texto: "Nacen y se crían con la madre hasta el destete.", yvy: "venta conjunta de terneros con los vecinos de la zona." },
+  { titulo: "Recría e invernada", categoria: "Novillitos y vaquillonas", tamano: 40, texto: "Ganan peso a campo durante meses.", yvy: "se compran terneros en volumen y se venden novillitos juntos." },
+  { titulo: "Engorde o feedlot", categoria: "Novillos", tamano: 46, texto: "Terminan el engorde hasta el peso de faena.", yvy: "el feedlot encuentra lotes grandes y parejos de la zona." },
+  { titulo: "Frigorífico", categoria: "Faena", tamano: 46, texto: "Compra por kg y procesa la carne.", yvy: "oferta por kg a toda la venta conjunta, con el martillero cerrando." },
+  { titulo: "Mercado", categoria: "Carnicería y supermercado", tamano: 40, texto: "La carne llega a la mesa de la región.", yvy: null },
+];
+
+/** Vaca simple dibujada a mano (ilustración genérica). */
+function Vaca({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
+      <ellipse cx="22" cy="26" rx="15" ry="10" fill="#6B3E26" />
+      <ellipse cx="17" cy="24" rx="4" ry="3" fill="#FFF8EC" />
+      <ellipse cx="27" cy="29" rx="3" ry="2.2" fill="#FFF8EC" />
+      <rect x="10" y="33" width="3.5" height="9" rx="1.5" fill="#4A2918" />
+      <rect x="28" y="33" width="3.5" height="9" rx="1.5" fill="#4A2918" />
+      <ellipse cx="38" cy="20" rx="7" ry="6" fill="#6B3E26" />
+      <ellipse cx="41" cy="23" rx="4" ry="2.8" fill="#E8751A" />
+      <path d="M34 14l-2-4M40 14l2-4" stroke="#F2B705" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="37" cy="18.5" r="1.2" fill="#1A1A1A" />
+    </svg>
+  );
+}
+
 /** Landing: cuenta qué es YvyTape y recién desde acá se entra a la plataforma. */
 export default async function Landing() {
   const perfil = await getSessionProfile();
@@ -28,6 +53,7 @@ export default async function Landing() {
           YvyTape
         </Link>
         <nav aria-label="Secciones" className="land-nav">
+          <a href="#recorrido">Recorrido</a>
           <a href="#como-funciona">Cómo funciona</a>
           <a href="#productores">Productores</a>
           <a href="#compradores">Compradores</a>
@@ -124,6 +150,31 @@ export default async function Landing() {
               por su parte.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ---------- Recorrido de la hacienda ---------- */}
+      <section id="recorrido" className="land-sec">
+        <div className="wide">
+          <h2 className="land-h2">El recorrido de la hacienda</h2>
+          <p className="muted land-lead">
+            Un animal pasa por varios campos antes de llegar al mercado. En cada venta del camino, YvyTape junta a los
+            productores de la zona para vender mejor.
+          </p>
+          <ol className="ruta" aria-label="Recorrido de la hacienda, del campo de cría al mercado">
+            {RUTA.map((e, i) => (
+              <li key={e.titulo} className="ruta-paso">
+                <div className="ruta-marca" aria-hidden="true">
+                  <Vaca size={e.tamano} />
+                </div>
+                <span className="ruta-num">{i + 1}</span>
+                <h3>{e.titulo}</h3>
+                <p className="ruta-cat">{e.categoria}</p>
+                <p>{e.texto}</p>
+                {e.yvy ? <p className="ruta-yvy"><strong>Con YvyTape:</strong> {e.yvy}</p> : null}
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 

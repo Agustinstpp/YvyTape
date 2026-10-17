@@ -8,7 +8,7 @@ import { getPoolDetail } from "@/features/pools/queries";
 import { getMyLots } from "@/features/lots/queries";
 import { miRespuesta } from "@/lib/front/derivados";
 import { categoryLabel, fmtInt, fmtKg, fmtMoney } from "@/lib/ui/format";
-import { IconArrowRight, IconChat, IconTruck } from "@/components/icons";
+import { IconArrowRight, IconChat, IconPin, IconTruck } from "@/components/icons";
 import { CerrarVenta, OfertarForm, SalirForm, SumarForm } from "./forms";
 
 export const metadata = { title: "Venta conjunta · YvyTape" };
@@ -144,6 +144,13 @@ export default async function VentaDetallePage({
             <Link href="/mis-lotes/nuevo">Registrar un lote</Link>
           </p>
         ) : null
+      ) : null}
+
+      {(esProductor || esOperador) && venta.status === "abierto" ? (
+        <Link href={`/ventas-conjuntas/${venta.id}/completar`} className="btn btn-s">
+          <IconPin size={22} strokeWidth={2.4} />
+          Completar la venta: ver productores cerca
+        </Link>
       ) : null}
 
       {esProductor && misLotesEnVenta.length > 0 && ["abierto", "objetivo_alcanzado"].includes(venta.status)
