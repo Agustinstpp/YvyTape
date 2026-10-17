@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSessionProfile } from "@/lib/session";
-import { mismaZona } from "@/lib/front/zonas";
+import { areZonesCompatible, mismaZona } from "@/lib/front/zonas";
 import { AppShell } from "@/components/app-shell";
 import { AnswerTag, HeadsProgress, PoolStatusTag } from "@/components/ui";
 import { getPoolDetail } from "@/features/pools/queries";
@@ -39,7 +39,7 @@ export default async function VentaDetallePage({
   const yoRespondi = perfil ? miRespuesta(venta, perfil) : null;
   const pesoTotal = venta.members.reduce((a, m) => a + (m.lot?.head_count ?? 0) * Number(m.lot?.average_weight_kg ?? 0), 0);
 
-  // Lotes propios que se pueden sumar: disponibles, misma categoría y zona
+  // Lotes propios que se pueden sumar: disponibles, misma categoría y zona (o zona compatible)
   let sumables: { id: string; label: string }[] = [];
   if (esProductor && venta.status === "abierto") {
     const { data: lotes } = await getMyLots();
@@ -48,7 +48,7 @@ export default async function VentaDetallePage({
         (l) =>
           l.status === "disponible" &&
           l.category === venta.category &&
-          mismaZona(l.farm?.zone, venta.zone) &&
+          areZonesCompatible(l.farm?.zone, venta.zone) &&
           venta.current_heads + l.head_count <= venta.target_heads
       )
       .map((l) => ({ id: l.id, label: `${l.title} · ${fmtInt(l.head_count)} cabezas` }));
@@ -140,7 +140,7 @@ export default async function VentaDetallePage({
           <SumarForm poolId={venta.id} lotes={sumables} />
         ) : misLotesEnVenta.length === 0 ? (
           <p className="card note">
-            Para sumarte necesitás un lote disponible de {categoryLabel(venta.category).toLowerCase()} en {venta.zone} que entre en lo que falta.{" "}
+            Para sumarte necesitás un lote disponible de {categoryLabel(venta.category).toLowerCase()} en {venta.zone} o zona cercana compatible que entre en lo que falta.{" "}
             <Link href="/mis-lotes/nuevo">Registrar un lote</Link>
           </p>
         ) : null

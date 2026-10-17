@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { mismaZona } from "@/lib/front/zonas";
+import { areZonesCompatible, mismaZona } from "@/lib/front/zonas";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { HeadsProgress, PoolStatusTag, Empty } from "@/components/ui";
@@ -26,7 +26,7 @@ export default async function VentasPage({
     ver === "mias" ? todas.filter((p) => participo.has(p.id)) : todas.filter((p) => p.status !== "cancelado");
   if (cat) lista = lista.filter((p) => p.category === cat);
   if (ver !== "mias" && ver !== "todas" && misZonas.length > 0) {
-    const cerca = lista.filter((p) => misZonas.some((z) => mismaZona(z, p.zone)) || participo.has(p.id));
+    const cerca = lista.filter((p) => misZonas.some((z) => areZonesCompatible(z, p.zone)) || participo.has(p.id));
     if (cerca.length) lista = cerca;
   }
 
