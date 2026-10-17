@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { LotStatusTag, Empty } from "@/components/ui";
-import { ventasDelProductor } from "@/lib/front/derivados";
+import { lotesQueEntran, ventasDelProductor } from "@/lib/front/derivados";
 import { IconPin, IconPlus } from "@/components/icons";
 import { categoryLabel, fmtInt, fmtKg } from "@/lib/ui/format";
 import type { LivestockLotWithFarm } from "@/lib/types/domain";
@@ -11,7 +11,8 @@ export const metadata = { title: "Mis lotes · YvyTape" };
 
 export default async function MisLotesPage() {
   const perfil = await requireProfile(["productor"]);
-  const { lotes, ventas } = await ventasDelProductor(perfil);
+  const { lotes, ventas, todas } = await ventasDelProductor(perfil);
+  const ventaDondeEntra = (l: LivestockLotWithFarm) => todas.find((p) => lotesQueEntran(p, [l]).length > 0);
   const ventaDe = (id: string) => ventas.find((v) => v.misLotes.some((l) => l.id === id))?.pool;
   const activos = lotes.filter((l) => l.status !== "vendido");
   const vendidos = lotes.filter((l) => l.status === "vendido");
@@ -39,9 +40,18 @@ export default async function MisLotesPage() {
             En la venta «{venta.title}»
           </Link>
         ) : lote.status === "disponible" ? (
-          <Link href={`/ventas-conjuntas?categoria=${lote.category}`} className="link-btn">
-            Sumarlo a una venta conjunta
-          </Link>
+          (() => {
+            const p = ventaDondeEntra(lote);
+            return p ? (
+              <Link href={`/ventas-conjuntas/${p.id}#sumar`} className="btn btn-p">
+                Sumarlo a «{p.title}» (faltan {fmtInt(p.target_heads - p.current_heads)})
+              </Link>
+            ) : (
+              <Link href={`/ventas-conjuntas?categoria=${lote.category}`} className="link-btn">
+                Buscar una venta conjunta
+              </Link>
+            );
+          })()
         ) : null}
       </article>
     );

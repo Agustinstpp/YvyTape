@@ -128,11 +128,6 @@ async function seedDemoUsers() {
           zone: userDef.zone,
           phone: userDef.phone,
         },
-        app_metadata: {
-          provider: "email",
-          providers: ["email"],
-          role: userDef.role,
-        },
       });
 
       let userId = data?.user?.id;

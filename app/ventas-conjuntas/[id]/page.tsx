@@ -82,6 +82,19 @@ export default async function VentaDetallePage({
         <PoolStatusTag status={venta.status} />
       </section>
 
+      {esProductor && venta.status === "abierto" ? (
+        sumables.length > 0 ? (
+          <div id="sumar">
+            <SumarForm poolId={venta.id} lotes={sumables} />
+          </div>
+        ) : misLotesEnVenta.length === 0 ? (
+          <p className="card note">
+            Para sumarte necesitás un lote disponible de {categoryLabel(venta.category).toLowerCase()} en {venta.zone} o zona cercana compatible que entre en lo que falta.{" "}
+            <Link href="/mis-lotes/nuevo">Registrar un lote</Link>
+          </p>
+        ) : null
+      ) : null}
+
       {oferta ? (
         <section className="card highlight">
           <h3 style={{ fontSize: 19 }}>Oferta recibida</h3>
@@ -135,16 +148,6 @@ export default async function VentaDetallePage({
       </section>
       <p className="small">Solo mostramos el establecimiento y la localidad. Los datos personales no se comparten.</p>
 
-      {esProductor && venta.status === "abierto" ? (
-        sumables.length > 0 ? (
-          <SumarForm poolId={venta.id} lotes={sumables} />
-        ) : misLotesEnVenta.length === 0 ? (
-          <p className="card note">
-            Para sumarte necesitás un lote disponible de {categoryLabel(venta.category).toLowerCase()} en {venta.zone} o zona cercana compatible que entre en lo que falta.{" "}
-            <Link href="/mis-lotes/nuevo">Registrar un lote</Link>
-          </p>
-        ) : null
-      ) : null}
 
       {(esProductor || esOperador) && venta.status === "abierto" ? (
         <Link href={`/ventas-conjuntas/${venta.id}/completar`} className="btn btn-s">
