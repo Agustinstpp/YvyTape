@@ -19,3 +19,6 @@ export function canonZona(texto: string): string {
 export function mismaZona(a?: string | null, b?: string | null): boolean {
   return !!a && !!b && normalizeZoneKey(a) === normalizeZoneKey(b);
 }
+
+export { areZonesCompatible } from "@/features/geography/zones";
+

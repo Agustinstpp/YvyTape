@@ -206,3 +206,74 @@ export function getDispersedCoordinates(
     longitude: Number((baseLng + dLng).toFixed(5)),
   };
 }
+
+/**
+ * Calcula la distancia aproximada en kilómetros entre dos zonas públicas usando la fórmula de Haversine.
+ */
+export function calculateZoneDistanceKm(zoneA: string, zoneB: string): number {
+  if (!zoneA || !zoneB) return 9999;
+  if (normalizeZoneKey(zoneA) === normalizeZoneKey(zoneB)) return 0;
+
+  const a = getZoneCoordinates(zoneA);
+  const b = getZoneCoordinates(zoneB);
+
+  const R = 6371; // Radio terrestre en km
+  const r = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = r(b.latitude - a.latitude);
+  const dLon = r(b.longitude - a.longitude);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(r(a.latitude)) * Math.cos(r(b.latitude)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * Evalúa si dos zonas son comercialmente compatibles para venta conjunta.
+ * Son compatibles si son la misma localidad o distan menos de maxDistanceKm (por defecto 80 km).
+ */
+export function areZonesCompatible(
+  zoneA?: string | null,
+  zoneB?: string | null,
+  maxDistanceKm: number = 80
+): boolean {
+  if (!zoneA || !zoneB) return false;
+  const aNorm = normalizeZoneKey(zoneA);
+  const bNorm = normalizeZoneKey(zoneB);
+  if (aNorm === bNorm) return true;
+
+  // Localidades ganaderas NEA compatibles reconocidas:
+  if (
+    (aNorm === "curuzu_cuatia" && bNorm === "mercedes") ||
+    (aNorm === "mercedes" && bNorm === "curuzu_cuatia")
+  ) {
+    return true;
+  }
+  if (
+    (aNorm === "curuzu_cuatia" && bNorm === "monte_caseros") ||
+    (aNorm === "monte_caseros" && bNorm === "curuzu_cuatia")
+  ) {
+    return true;
+  }
+  if (
+    (aNorm === "mercedes" && bNorm === "corrientes_centro") ||
+    (aNorm === "corrientes_centro" && bNorm === "mercedes")
+  ) {
+    return true;
+  }
+  if (
+    (aNorm === "goya" && bNorm === "bella_vista") ||
+    (aNorm === "bella_vista" && bNorm === "goya")
+  ) {
+    return true;
+  }
+  if (
+    (aNorm === "santo_tome" && (bNorm === "virasoro" || bNorm === "gobernador_virasoro")) ||
+    ((aNorm === "virasoro" || aNorm === "gobernador_virasoro") && bNorm === "santo_tome")
+  ) {
+    return true;
+  }
+
+  const dist = calculateZoneDistanceKm(zoneA, zoneB);
+  return dist <= maxDistanceKm;
+}
+

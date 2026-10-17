@@ -17,26 +17,42 @@ import { freightInputSchema } from "@/features/freight/validators";
 import {
   DEMO_FREIGHT_SCENARIO,
   DEMO_PRODUCER_CONTRIBUTIONS,
-  DEMO_COMPARISON_SCENARIO,
 } from "@/features/freight/scenarios";
+import { ProducerContributionInput } from "@/features/freight/types";
 import { FreightComparison } from "./FreightComparison";
 import { FreightSummary } from "./FreightSummary";
+
+export interface RealPoolFreightData {
+  poolId: string;
+  title: string;
+  zone: string;
+  heads: number;
+  estimatedWeightKg: number;
+  producersCount: number;
+  contributions: ProducerContributionInput[];
+}
 
 export interface FreightCalculatorProps {
   initialHeads?: number;
   poolId?: string;
+  realPoolData?: RealPoolFreightData;
   className?: string;
 }
 
 export function FreightCalculator({
   initialHeads,
   poolId,
+  realPoolData,
   className = "",
 }: FreightCalculatorProps) {
-  // Estado del formulario
+  // Estado del formulario inicializado con datos reales si están disponibles
   const [kilometers, setKilometers] = useState<number>(DEMO_FREIGHT_SCENARIO.kilometers);
-  const [stops, setStops] = useState<number>(DEMO_FREIGHT_SCENARIO.stops);
-  const [heads, setHeads] = useState<number>(initialHeads || DEMO_FREIGHT_SCENARIO.heads);
+  const [stops, setStops] = useState<number>(
+    realPoolData ? Math.max(1, realPoolData.producersCount - 1) : DEMO_FREIGHT_SCENARIO.stops
+  );
+  const [heads, setHeads] = useState<number>(
+    realPoolData?.heads || initialHeads || DEMO_FREIGHT_SCENARIO.heads
+  );
   const [fixedCost, setFixedCost] = useState<number>(DEMO_FREIGHT_SCENARIO.fixedCost);
   const [costPerKm, setCostPerKm] = useState<number>(DEMO_FREIGHT_SCENARIO.costPerKm);
   const [stopSurcharge, setStopSurcharge] = useState<number>(DEMO_FREIGHT_SCENARIO.stopSurcharge);
@@ -46,10 +62,11 @@ export function FreightCalculator({
 
   // Modo de visualización: "simple" | "comparativa" | "reparto"
   const [activeTab, setActiveTab] = useState<"simple" | "comparativa" | "reparto">("simple");
-  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Estado para comparación personalizada
-  const [individualHeads, setIndividualHeads] = useState<number>(15);
+  const [individualHeads, setIndividualHeads] = useState<number>(
+    realPoolData?.contributions?.[0]?.heads || 15
+  );
   const [individualKm, setIndividualKm] = useState<number>(180);
 
   // Cálculo en tiempo real
@@ -66,13 +83,13 @@ export function FreightCalculator({
     [kilometers, stops, heads, fixedCost, costPerKm, stopSurcharge, declaredCapacity]
   );
 
-  const freightResult: FreightResult = useMemo(() => {
+  // Validación derivada puramente sin efectos secundarios durante render
+  const validationError: string | null = useMemo(() => {
     const val = freightInputSchema.safeParse(currentInput);
-    if (!val.success) {
-      setValidationError(val.error.errors[0]?.message || "Datos inválidos");
-    } else {
-      setValidationError(null);
-    }
+    return val.success ? null : val.error.errors[0]?.message || "Datos inválidos";
+  }, [currentInput]);
+
+  const freightResult: FreightResult = useMemo(() => {
     return calculateFreight(currentInput);
   }, [currentInput]);
 
@@ -110,20 +127,23 @@ export function FreightCalculator({
   ]);
 
   const contributions: ProducerContributionResult[] = useMemo(() => {
-    return distributeFreightCost(freightResult.totalCost, DEMO_PRODUCER_CONTRIBUTIONS);
-  }, [freightResult.totalCost]);
+    const activeContributions =
+      realPoolData?.contributions && realPoolData.contributions.length > 0
+        ? realPoolData.contributions
+        : DEMO_PRODUCER_CONTRIBUTIONS;
+    return distributeFreightCost(freightResult.totalCost, activeContributions);
+  }, [freightResult.totalCost, realPoolData]);
 
   const handleResetToDemo = () => {
     setKilometers(DEMO_FREIGHT_SCENARIO.kilometers);
     setStops(DEMO_FREIGHT_SCENARIO.stops);
-    setHeads(initialHeads || DEMO_FREIGHT_SCENARIO.heads);
+    setHeads(DEMO_FREIGHT_SCENARIO.heads);
     setFixedCost(DEMO_FREIGHT_SCENARIO.fixedCost);
     setCostPerKm(DEMO_FREIGHT_SCENARIO.costPerKm);
     setStopSurcharge(DEMO_FREIGHT_SCENARIO.stopSurcharge);
     setDeclaredCapacity(48);
     setIndividualHeads(15);
     setIndividualKm(180);
-    setValidationError(null);
   };
 
   return (
@@ -177,6 +197,31 @@ export function FreightCalculator({
           Cargar Escenario Demo (40 cab. / 200 km)
         </button>
       </div>
+
+      {realPoolData ? (
+        <div
+          style={{
+            backgroundColor: "#f8fafc",
+            border: "1px solid #cbd5e1",
+            borderRadius: "0.5rem",
+            padding: "0.75rem 1rem",
+            marginBottom: "1rem",
+            fontSize: "0.875rem",
+            color: "#1e293b",
+          }}
+        >
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "0.25rem" }}>
+            <span style={{ fontWeight: 700, color: "#047857" }}>● Datos reales de venta conjunta:</span>
+            <strong>{realPoolData.title}</strong>
+          </div>
+          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", color: "#475569" }}>
+            <span><strong>Origen:</strong> {realPoolData.zone}</span>
+            <span><strong>Total cabezas:</strong> {realPoolData.heads}</span>
+            <span><strong>Productores:</strong> {realPoolData.producersCount}</span>
+            <span><strong>Peso estimado:</strong> {realPoolData.estimatedWeightKg.toLocaleString("es-AR")} kg</span>
+          </div>
+        </div>
+      ) : null}
 
       {/* Selector de pestañas */}
       <div

@@ -243,6 +243,78 @@ export interface Database {
           created_at?: string;
         };
       };
+      conversations: {
+        Row: {
+          id: string;
+          subject: string;
+          context: string;
+          pool_id: string | null;
+          lot_id: string | null;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          subject: string;
+          context: string;
+          pool_id?: string | null;
+          lot_id?: string | null;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          subject?: string;
+          context?: string;
+          pool_id?: string | null;
+          lot_id?: string | null;
+          created_by?: string;
+          created_at?: string;
+        };
+      };
+      conversation_participants: {
+        Row: {
+          conversation_id: string;
+          user_id: string;
+          joined_at: string;
+          last_read_at: string;
+        };
+        Insert: {
+          conversation_id: string;
+          user_id: string;
+          joined_at?: string;
+          last_read_at?: string;
+        };
+        Update: {
+          conversation_id?: string;
+          user_id?: string;
+          joined_at?: string;
+          last_read_at?: string;
+        };
+      };
+      messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          sender_id: string;
+          body: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          sender_id: string;
+          body: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          conversation_id?: string;
+          sender_id?: string;
+          body?: string;
+          created_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
