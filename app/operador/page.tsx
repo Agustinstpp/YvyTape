@@ -3,9 +3,8 @@ import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { HeadsProgress, PoolStatusTag, Empty } from "@/components/ui";
 import { getPools } from "@/features/pools/queries";
-import { IconLogout, IconPlus } from "@/components/icons";
+import { IconPlus } from "@/components/icons";
 import { categoryLabel } from "@/lib/ui/format";
-import { salir } from "@/app/acciones";
 
 export const metadata = { title: "Panel del martillero · YvyTape" };
 
@@ -37,12 +36,6 @@ export default async function OperadorPage() {
         <IconPlus size={24} strokeWidth={2.4} />
         Armar una venta conjunta
       </Link>
-      <form action={salir}>
-        <button type="submit" className="link-btn">
-          <IconLogout size={22} />
-          Salir de YvyTape
-        </button>
-      </form>
     </AppShell>
   );
 }

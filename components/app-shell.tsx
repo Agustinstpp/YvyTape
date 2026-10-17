@@ -1,12 +1,14 @@
 import Link from "next/link";
 import type { Profile, UserRole } from "@/lib/types/domain";
 import { mensajes } from "@/lib/front/mensajes";
+import { salir } from "@/app/acciones";
 import { avisosDelProductor } from "@/lib/front/derivados";
 import {
   IconArrowLeft,
   IconChat,
   IconGroup,
   IconHome,
+  IconLogout,
   IconLots,
   IconSearch,
   IconTag,
@@ -70,6 +72,14 @@ export async function AppShell({ title, subtitle, back, perfil, current, childre
           <h1>{title}</h1>
           {subtitle ? <p className="sub">{subtitle}</p> : null}
         </div>
+        {perfil ? (
+          <form action={salir} className="salir-form">
+            <button type="submit" className="salir-btn" aria-label="Cerrar sesión">
+              <IconLogout size={22} strokeWidth={2.4} />
+              <span>Salir</span>
+            </button>
+          </form>
+        ) : null}
       </header>
       <main className="page">{children}</main>
       {items.length > 0 ? (

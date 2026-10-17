@@ -2,9 +2,8 @@ import Link from "next/link";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { avisosDelProductor, ventasDelProductor } from "@/lib/front/derivados";
-import { IconArrowRight, IconBell, IconLogout, IconPlus } from "@/components/icons";
+import { IconArrowRight, IconBell, IconPlus } from "@/components/icons";
 import { categoryLabel, fmtInt } from "@/lib/ui/format";
-import { salir } from "@/app/acciones";
 
 export const metadata = { title: "Inicio · YvyTape" };
 
@@ -70,12 +69,6 @@ export default async function InicioPage() {
         <p className="card note">Todavía no registraste lotes. Cargá el primero y te mostramos ventas conjuntas cerca tuyo.</p>
       ) : null}
 
-      <form action={salir}>
-        <button type="submit" className="link-btn">
-          <IconLogout size={22} />
-          Salir de YvyTape
-        </button>
-      </form>
     </AppShell>
   );
 }
