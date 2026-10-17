@@ -36,6 +36,20 @@ function admin() {
   }
 }
 
+/** Traduce el error de Supabase al registrarse, en vez de suponer siempre "correo ya registrado". */
+function errorDeRegistro(e: { code?: string; message: string; status?: number }): string {
+  console.error("[registrarse]", e.code, e.status, e.message);
+  const t = `${e.code ?? ""} ${e.message}`.toLowerCase();
+  if (/already|exists|registered/.test(t)) return "Ese correo ya tiene una cuenta. Probá desde Ingresar.";
+  if (/rate limit|over_email_send/.test(t))
+    return "Supabase frenó el envío de correos de confirmación. Hay que desactivar «Confirm email» en Supabase o esperar un rato.";
+  if (/signup.*disabled|signups not allowed/.test(t)) return "El registro de cuentas está desactivado en Supabase.";
+  if (/weak|password/.test(t)) return "La contraseña es muy débil. Usá al menos 8 letras y números.";
+  if (/invalid.*email|email.*invalid/.test(t)) return "Supabase no aceptó ese correo. Probá con otro.";
+  if (/database error/.test(t)) return "La base de datos no pudo crear el perfil. Avisale al equipo de backend.";
+  return `No pudimos crear la cuenta (${e.message}).`;
+}
+
 async function confirmarCorreo(email: string): Promise<boolean> {
   const a = admin();
   if (!a) return false;
@@ -89,7 +103,7 @@ export async function registrarse(_: FormState, fd: FormData): Promise<FormState
       email_confirm: true,
       user_metadata: { full_name, zone, role },
     });
-    if (error) return { error: "No pudimos crear la cuenta. Puede que ese correo ya esté registrado." };
+    if (error) return { error: errorDeRegistro(error) };
     const { error: e2 } = await supabase.auth.signInWithPassword({ email, password });
     if (e2) return { error: "La cuenta se creó, pero no pudimos ingresar. Probá desde Ingresar." };
   } else {
@@ -98,7 +112,7 @@ export async function registrarse(_: FormState, fd: FormData): Promise<FormState
       password,
       options: { data: { full_name, zone, role } },
     });
-    if (error) return { error: "No pudimos crear la cuenta. Puede que ese correo ya esté registrado." };
+    if (error) return { error: errorDeRegistro(error) };
     if (!data.session) return { ok: "Te mandamos un correo para confirmar la cuenta. Abrilo y después entrá." };
   }
   redirect(role === "comprador" ? "/ofertas" : "/inicio");
