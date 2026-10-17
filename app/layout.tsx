@@ -15,7 +15,13 @@ export const viewport: Viewport = {
 
 // Aviso para desarrollo: sin Supabase configurado los botones parecen no hacer nada.
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const sinSupabase = !url || url.includes("your-project-ref") || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.startsWith("eyJ") || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.endsWith("...");
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const sinSupabase =
+  !url ||
+  url.includes("your-project-ref") ||
+  !anonKey ||
+  anonKey.endsWith("...") ||
+  (!anonKey.startsWith("eyJ") && !anonKey.startsWith("sb_publishable_") && !anonKey.startsWith("sbp_"));
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
