@@ -4,6 +4,7 @@ import { getMyLots } from "@/features/lots/queries";
 import { getPools } from "@/features/pools/queries";
 import { IconCheck, IconGroup, IconHome } from "@/components/icons";
 import { categoryLabel, fmtInt, fmtKg } from "@/lib/ui/format";
+import { lotesQueEntran } from "@/lib/front/derivados";
 
 export const metadata = { title: "Lote guardado · YvyTape" };
 
@@ -12,9 +13,7 @@ export default async function LoteGuardadoPage({ searchParams }: { searchParams:
   const { lote: loteId } = await searchParams;
   const [{ data: lotes }, { data: pools }] = await Promise.all([getMyLots(), getPools({ status: "abierto" })]);
   const lote = (lotes ?? []).find((l) => l.id === loteId);
-  const cerca = lote
-    ? (pools ?? []).filter((p) => p.category === lote.category && p.zone.toLowerCase() === (lote.farm?.zone ?? "").toLowerCase())
-    : [];
+  const cerca = lote ? (pools ?? []).filter((p) => lotesQueEntran(p, [lote]).length > 0) : [];
 
   return (
     <div className="app">
@@ -38,8 +37,13 @@ export default async function LoteGuardadoPage({ searchParams }: { searchParams:
           <section className="card highlight">
             <h2 style={{ fontSize: 19 }}>¿Y ahora?</h2>
             <p>
-              Hay {cerca.length === 1 ? "1 venta conjunta" : `${cerca.length} ventas conjuntas`} de {categoryLabel(lote!.category).toLowerCase()} cerca tuyo. Sumate para llegar a un comprador más grande.
+              Tu lote entra en {cerca.length === 1 ? "esta venta conjunta" : "estas ventas conjuntas"} de {categoryLabel(lote!.category).toLowerCase()} cerca tuyo. Sumate para llegar a un comprador más grande.
             </p>
+            {cerca.slice(0, 3).map((p) => (
+              <Link key={p.id} href={`/ventas-conjuntas/${p.id}#sumar`} className="btn" style={{ background: "var(--blanco)", color: "var(--negro)" }}>
+                Sumarlo a «{p.title}» · faltan {fmtInt(p.target_heads - p.current_heads)}
+              </Link>
+            ))}
           </section>
         ) : null}
         <div className="spacer" />

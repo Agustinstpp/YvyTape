@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
-import { avisosDelProductor, ventasDelProductor } from "@/lib/front/derivados";
+import { avisosDelProductor, lotesQueEntran, ventasDelProductor } from "@/lib/front/derivados";
 import { IconArrowRight, IconBell, IconPlus } from "@/components/icons";
 import { categoryLabel, fmtInt } from "@/lib/ui/format";
 
@@ -18,11 +18,9 @@ export default async function InicioPage() {
   const urgentes = avisos.filter((a) => a.urgente);
 
   // Venta abierta cerca, de una categoría que el productor tiene disponible
-  const misCategorias = new Set(disponibles.map((l) => l.category));
-  const misZonas = new Set(disponibles.map((l) => l.farm?.zone?.toLowerCase()));
-  const sugerida = todas.find(
-    (p) => p.status === "abierto" && misCategorias.has(p.category) && misZonas.has(p.zone.toLowerCase()) && !ventas.some((v) => v.pool.id === p.id)
-  );
+  // Venta abierta donde entra alguno de mis lotes (misma categoría, zona compatible y que no se pase del objetivo)
+  const sugerida = todas.find((p) => !ventas.some((v) => v.pool.id === p.id) && lotesQueEntran(p, disponibles).length > 0);
+  const loteSugerido = sugerida ? lotesQueEntran(sugerida, disponibles)[0] : null;
 
   return (
     <AppShell title={`Hola, ${perfil.full_name}`} subtitle={perfil.zone ?? undefined} perfil={perfil} current="inicio">
@@ -54,13 +52,14 @@ export default async function InicioPage() {
 
       {sugerida ? (
         <section className="card">
-          <h2 style={{ fontSize: 19 }}>Cerca tuyo</h2>
+          <h2 style={{ fontSize: 19 }}>Podés completar una venta cerca tuyo</h2>
           <p>
-            Hay una venta conjunta de <strong>{categoryLabel(sugerida.category).toLowerCase()}</strong> en {sugerida.zone} que necesita{" "}
-            {fmtInt(Math.max(0, sugerida.target_heads - sugerida.current_heads))} cabezas más.
+            «{sugerida.title}» ({categoryLabel(sugerida.category).toLowerCase()} en {sugerida.zone}) necesita{" "}
+            <strong>{fmtInt(Math.max(0, sugerida.target_heads - sugerida.current_heads))} cabezas más</strong>
+            {loteSugerido ? <> y tu lote de {fmtInt(loteSugerido.head_count)} entra.</> : "."}
           </p>
-          <Link href={`/ventas-conjuntas/${sugerida.id}`} className="link-btn">
-            Ver la venta <IconArrowRight size={22} strokeWidth={2.4} />
+          <Link href={`/ventas-conjuntas/${sugerida.id}#sumar`} className="btn btn-p">
+            Sumar mi lote <IconArrowRight size={22} strokeWidth={2.4} />
           </Link>
         </section>
       ) : null}

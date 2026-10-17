@@ -4,7 +4,7 @@
  */
 import { getZoneCoordinates } from "@/features/geography/zones";
 import type { LivestockLotWithFarm, PoolDetail } from "@/lib/types/domain";
-import { mismaZona } from "@/lib/front/zonas";
+import { areZonesCompatible, mismaZona } from "@/lib/front/zonas";
 
 export const RADIO_KM = 75;
 
@@ -42,9 +42,9 @@ export function cercanosPara(venta: PoolDetail, disponibles: LivestockLotWithFar
   for (const l of disponibles) {
     if (l.producer_id === miId || enVenta.has(l.id) || l.category !== venta.category) continue;
     const zona = l.farm?.zone;
-    if (!zona) continue;
+    // Solo zonas que el backend acepta para sumarse (are_zones_compatible)
+    if (!zona || !areZonesCompatible(zona, venta.zone)) continue;
     const o = offsetKm(venta.zone, zona);
-    if (o.km > RADIO_KM) continue;
     const key = zona.toLowerCase();
     const c = porZona.get(key) ?? { zona, cabezas: 0, km: Math.round(o.km), lotes: [], mismaZona: mismaZona(zona, venta.zone), dx: o.dx, dy: o.dy };
     c.cabezas += l.head_count;
@@ -64,4 +64,12 @@ export function masCercanosQueCompletan(cercanos: Cercano[], faltan: number): Ce
     suma += c.cabezas;
   }
   return suma >= faltan ? elegidos : [];
+}
+
+/** Lotes disponibles de otros productores que el backend aceptaría en esta venta. */
+export function lotesCompatibles(venta: PoolDetail, disponibles: LivestockLotWithFarm[], miId: string): LivestockLotWithFarm[] {
+  const enVenta = new Set(venta.members.map((m) => m.lot_id));
+  return disponibles.filter(
+    (l) => l.producer_id !== miId && !enVenta.has(l.id) && l.category === venta.category && areZonesCompatible(l.farm?.zone, venta.zone)
+  );
 }

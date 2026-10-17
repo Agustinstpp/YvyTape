@@ -3,7 +3,7 @@ import { areZonesCompatible, mismaZona } from "@/lib/front/zonas";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { HeadsProgress, PoolStatusTag, Empty } from "@/components/ui";
-import { ventasDelProductor } from "@/lib/front/derivados";
+import { ventasDelProductor, lotesQueEntran } from "@/lib/front/derivados";
 import { IconPin, IconPlus } from "@/components/icons";
 import { CATEGORIES, categoryLabel } from "@/lib/ui/format";
 import type { LivestockCategory, PoolSummary } from "@/lib/types/domain";
@@ -19,6 +19,7 @@ export default async function VentasPage({
   const { ver, categoria } = await searchParams;
   const { ventas, todas, lotes } = await ventasDelProductor(perfil);
   const participo = new Set(ventas.map((v) => v.pool.id));
+  const disponibles = lotes.filter((l) => l.status === "disponible");
   const cat = CATEGORIES.includes(categoria as LivestockCategory) ? (categoria as LivestockCategory) : null;
 
   const misZonas = lotes.map((l) => l.farm?.zone).filter(Boolean) as string[];
@@ -73,6 +74,9 @@ export default async function VentasPage({
             <div className="row-wrap">
               <PoolStatusTag status={p.status} />
               {participo.has(p.id) ? <span className="tag" style={{ background: "var(--naranja)" }}>Participás</span> : null}
+              {!participo.has(p.id) && lotesQueEntran(p, disponibles).length > 0 ? (
+                <span className="tag tag-ok">Tu lote entra: podés sumarte</span>
+              ) : null}
             </div>
           </Link>
         ))}

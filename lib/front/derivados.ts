@@ -5,6 +5,7 @@
  */
 import { getMyLots } from "@/features/lots/queries";
 import { getPools, getPoolDetail } from "@/features/pools/queries";
+import { areZonesCompatible } from "@/lib/front/zonas";
 import type {
   LivestockLotWithFarm,
   PoolDetail,
@@ -100,4 +101,19 @@ export async function ofertasDelComprador(perfil: Profile): Promise<PoolDetail[]
   return detalles
     .map((d) => d.data)
     .filter((d): d is PoolDetail => !!d && d.active_offer?.buyer_id === perfil.id);
+}
+
+/** Lotes propios disponibles que el backend aceptaría en esta venta (categoría, zona compatible y que entren). */
+export function lotesQueEntran(
+  pool: Pick<PoolSummary, "status" | "category" | "zone" | "current_heads" | "target_heads">,
+  lotes: LivestockLotWithFarm[]
+): LivestockLotWithFarm[] {
+  if (pool.status !== "abierto") return [];
+  return lotes.filter(
+    (l) =>
+      l.status === "disponible" &&
+      l.category === pool.category &&
+      areZonesCompatible(l.farm?.zone, pool.zone) &&
+      pool.current_heads + l.head_count <= pool.target_heads
+  );
 }

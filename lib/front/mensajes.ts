@@ -79,6 +79,16 @@ function memoryNuevoId(prefijo: string) {
   return `${prefijo}-${memoryStore.seq}`;
 }
 
+/**
+ * Con Supabase configurado (producción/Vercel) NO se usa la memoria como respaldo: cada servidor de Vercel
+ * tiene su propia memoria y la conversación "desaparecía" (/mensajes/c-3 → no encontrada).
+ * Sin Supabase (tests o desarrollo sin .env) se mantiene el respaldo en memoria.
+ */
+function supabaseConfigurado(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  return !!url && !url.includes("your-project-ref") && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+}
+
 const supabaseAdapter: MensajesAdapter = {
   esDemo: false,
 
@@ -381,8 +391,12 @@ const supabaseAdapter: MensajesAdapter = {
       }
 
       return { data: { id: convId } };
-    } catch (_err) {
-      // Fallback a memoria
+    } catch (err) {
+      if (supabaseConfigurado()) {
+        console.error("[mensajes.iniciar]", err);
+        return { error: "No pudimos enviar la consulta. Probá de nuevo en un momento." };
+      }
+      // Fallback a memoria (solo sin Supabase)
       const existente = memoryStore.conversaciones.find(
         (c) => c.poolId === (datos.poolId ?? null) && c.lotId === (datos.lotId ?? null) && c.participantes.some((p) => p.nombre === perfil.full_name)
       );
@@ -442,7 +456,11 @@ const supabaseAdapter: MensajesAdapter = {
         );
 
       return { data: { id: msg.id } };
-    } catch (_err) {
+    } catch (err) {
+      if (supabaseConfigurado()) {
+        console.error("[mensajes.enviar]", err);
+        return { error: "No pudimos enviar el mensaje. Probá de nuevo en un momento." };
+      }
       const conv = memoryStore.conversaciones.find((c) => c.id === id);
       if (!conv) return { error: "La conversación no existe." };
       const ahora = new Date().toISOString();
