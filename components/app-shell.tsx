@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Profile, UserRole } from "@/lib/types/domain";
 import { mensajes } from "@/lib/front/mensajes";
 import { salir } from "@/app/acciones";
-import { avisosDelProductor } from "@/lib/front/derivados";
+import { avisosDelProductor, negociacionesDelMartillero } from "@/lib/front/derivados";
 import {
   IconArrowLeft,
   IconChat,
@@ -50,7 +50,11 @@ type ShellProps = {
 //   Con un endpoint de "mis ventas" o de avisos del backend se resuelve.
 export async function AppShell({ title, subtitle, back, perfil, current, children }: ShellProps) {
   let unread = 0;
+  let listasParaCerrar = 0;
   if (perfil) {
+    if (perfil.role === "operador") {
+      listasParaCerrar = (await negociacionesDelMartillero()).filter((n) => n.lista).length;
+    }
     unread = await mensajes.sinLeer(perfil);
     if (perfil.role === "productor") {
       unread += (await avisosDelProductor(perfil)).filter((a) => a.urgente).length;
@@ -93,19 +97,26 @@ export async function AppShell({ title, subtitle, back, perfil, current, childre
             YvyTape
           </Link>
           {items.map(({ key, href, label, Icon }) => {
-            const showBadge = key === "mensajes" && unread > 0;
+            const cantidad = key === "mensajes" ? unread : key === "operador" ? listasParaCerrar : 0;
+            const showBadge = cantidad > 0;
             return (
               <Link
                 key={key}
                 href={href}
                 aria-current={key === current ? "page" : undefined}
-                aria-label={showBadge ? `${label}, ${unread} avisos sin leer` : undefined}
+                aria-label={
+                  showBadge
+                    ? key === "operador"
+                      ? `${label}, ${cantidad} listas para cerrar`
+                      : `${label}, ${cantidad} avisos sin leer`
+                    : undefined
+                }
               >
                 <Icon />
                 {label}
                 {showBadge ? (
                   <span className="badge" aria-hidden="true">
-                    {unread > 9 ? "9+" : unread}
+                    {cantidad > 9 ? "9+" : cantidad}
                   </span>
                 ) : null}
               </Link>

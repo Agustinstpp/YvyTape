@@ -168,7 +168,12 @@ export default async function VentaDetallePage({
       ) : null}
 
       {esOperador && oferta && aceptaron === productores.length && productores.length > 0 ? (
-        <CerrarVenta poolId={venta.id} />
+        <div id="cerrar" className="stack">
+          <p className="alert alert-ok" role="status">
+            Aceptaron los {productores.length} productores. Ya podés cerrar la venta.
+          </p>
+          <CerrarVenta poolId={venta.id} />
+        </div>
       ) : null}
 
       <Link href={`/flete?cabezas=${venta.current_heads}&venta=${venta.id}`} className="link-btn" style={{ justifyContent: "center" }}>

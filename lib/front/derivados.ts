@@ -117,3 +117,33 @@ export function lotesQueEntran(
       pool.current_heads + l.head_count <= pool.target_heads
   );
 }
+
+export interface Negociacion {
+  pool: PoolDetail;
+  aceptaron: number;
+  productores: number;
+  /** Todos los productores aceptaron la oferta: el martillero puede cerrar. */
+  lista: boolean;
+}
+
+/** Estado de la oferta activa de una venta en negociación (misma cuenta que usa el backend al cerrar). */
+export function estadoNegociacion(pool: PoolDetail): Negociacion | null {
+  const oferta = pool.active_offer;
+  if (pool.status !== "en_negociacion" || !oferta || oferta.status !== "pendiente") return null;
+  const productores = new Set(pool.members.map((m) => m.lot?.producer_id).filter(Boolean) as string[]);
+  const aceptaron = new Set(
+    (oferta.confirmations ?? []).filter((c) => c.accepted && productores.has(c.producer_id)).map((c) => c.producer_id)
+  ).size;
+  return { pool, aceptaron, productores: productores.size, lista: productores.size > 0 && aceptaron >= productores.size };
+}
+
+/** Ventas en negociación con su avance; las listas para cerrar primero. Solo pide el detalle de esas ventas. */
+export async function negociacionesDelMartillero(): Promise<Negociacion[]> {
+  const { data: pools } = await getPools();
+  const enNegociacion = (pools ?? []).filter((p) => p.status === "en_negociacion");
+  const detalles = await Promise.all(enNegociacion.map((p) => getPoolDetail(p.id)));
+  return detalles
+    .map(({ data }) => (data ? estadoNegociacion(data) : null))
+    .filter((n): n is Negociacion => n !== null)
+    .sort((a, b) => Number(b.lista) - Number(a.lista));
+}
