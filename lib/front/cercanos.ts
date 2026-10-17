@@ -6,7 +6,7 @@ import { getZoneCoordinates } from "@/features/geography/zones";
 import type { LivestockLotWithFarm, PoolDetail } from "@/lib/types/domain";
 import { mismaZona } from "@/lib/front/zonas";
 
-export const RADIO_KM = 50;
+export const RADIO_KM = 75;
 
 export interface Cercano {
   zona: string;

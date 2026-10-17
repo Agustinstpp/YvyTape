@@ -1,4 +1,5 @@
 import { LivestockLotWithFarm, SalesPool, PoolStatus } from "@/lib/types/domain";
+import { areZonesCompatible } from "@/features/geography/zones";
 
 export interface LotCompatibilityResult {
   isCompatible: boolean;
@@ -56,14 +57,11 @@ export function checkLotCompatibility(
     };
   }
 
-  // 4. Compatibilidad de Zona
-  const lotZone = lot.farm?.zone?.trim().toLowerCase();
-  const poolZone = pool.zone?.trim().toLowerCase();
-
-  if (!lotZone || lotZone !== poolZone) {
+  // 4. Compatibilidad de Zona (misma zona o zona cercana compatible)
+  if (!areZonesCompatible(lot.farm?.zone, pool.zone)) {
     return {
       isCompatible: false,
-      reason: `La zona del lote (${lot.farm?.zone || "Sin zona"}) no coincide con la venta conjunta (${pool.zone}).`,
+      reason: `La zona del lote (${lot.farm?.zone || "Sin zona"}) no coincide ni es compatible con la venta conjunta (${pool.zone}).`,
     };
   }
 
