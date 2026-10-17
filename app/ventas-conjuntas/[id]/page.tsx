@@ -1,0 +1,178 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireProfile } from "@/lib/session";
+import { AppShell } from "@/components/app-shell";
+import { AnswerTag, HeadsProgress, PoolStatusTag } from "@/components/ui";
+import { getPoolDetail } from "@/features/pools/queries";
+import { getMyLots } from "@/features/lots/queries";
+import { miRespuesta } from "@/lib/front/derivados";
+import { categoryLabel, fmtInt, fmtKg, fmtMoney } from "@/lib/ui/format";
+import { IconArrowRight, IconChat, IconTruck } from "@/components/icons";
+import { CerrarVenta, OfertarForm, SalirForm, SumarForm } from "./forms";
+
+export const metadata = { title: "Venta conjunta · YvyTape" };
+
+export default async function VentaDetallePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ respuesta?: string }>;
+}) {
+  const perfil = await requireProfile();
+  const { id } = await params;
+  const { respuesta } = await searchParams;
+  const { data: venta } = await getPoolDetail(id);
+  if (!venta) notFound();
+
+  const esProductor = perfil.role === "productor";
+  const esComprador = perfil.role === "comprador";
+  const esOperador = perfil.role === "operador";
+
+  const misLotesEnVenta = venta.members.filter((m) => m.lot?.producer_id === perfil.id).map((m) => m.lot);
+  const oferta = venta.active_offer && venta.active_offer.status === "pendiente" ? venta.active_offer : null;
+  const ultimaOferta = venta.active_offer ?? null;
+  const productores = Array.from(new Set(venta.members.map((m) => m.lot?.producer_id).filter(Boolean)));
+  const aceptaron = oferta?.confirmations?.filter((c) => c.accepted).length ?? 0;
+  const yoRespondi = miRespuesta(venta, perfil);
+  const pesoTotal = venta.members.reduce((a, m) => a + (m.lot?.head_count ?? 0) * Number(m.lot?.average_weight_kg ?? 0), 0);
+
+  // Lotes propios que se pueden sumar: disponibles, misma categoría y zona
+  let sumables: { id: string; label: string }[] = [];
+  if (esProductor && venta.status === "abierto") {
+    const { data: lotes } = await getMyLots();
+    sumables = (lotes ?? [])
+      .filter(
+        (l) =>
+          l.status === "disponible" &&
+          l.category === venta.category &&
+          (l.farm?.zone ?? "").toLowerCase().trim() === venta.zone.toLowerCase().trim() &&
+          venta.current_heads + l.head_count <= venta.target_heads
+      )
+      .map((l) => ({ id: l.id, label: `${l.title} · ${fmtInt(l.head_count)} cabezas` }));
+  }
+
+  return (
+    <AppShell
+      title="Venta conjunta"
+      back={{ href: esComprador ? "/ofertas" : esOperador ? "/operador" : "/ventas-conjuntas", label: "Volver" }}
+      perfil={perfil}
+      current={esComprador ? "ofertas" : esOperador ? "operador" : "ventas"}
+    >
+      {respuesta ? (
+        <p className="alert alert-ok" role="status">
+          {respuesta === "si"
+            ? "Aceptaste tu parte. Te avisamos en YvyTape cuando respondan todos."
+            : "Registramos que no aceptás. La oferta se cae y la venta sigue abierta a otras ofertas."}
+        </p>
+      ) : null}
+
+      <div>
+        <h2 style={{ fontSize: 30 }}>{venta.title}</h2>
+        <p className="muted">
+          {categoryLabel(venta.category)} · {venta.zone}
+        </p>
+      </div>
+
+      <section className="card">
+        <p style={{ fontWeight: 700, color: "var(--texto-apoyo)" }}>Objetivo: {fmtInt(venta.target_heads)} cabezas</p>
+        <HeadsProgress current={venta.current_heads} target={venta.target_heads} big />
+        <PoolStatusTag status={venta.status} />
+      </section>
+
+      {oferta ? (
+        <section className="card highlight">
+          <h3 style={{ fontSize: 22 }}>Oferta recibida</h3>
+          <p style={{ fontSize: 34, lineHeight: 1.1, fontWeight: 800 }}>
+            {fmtMoney(Number(oferta.price_per_kg))} <span style={{ fontSize: 20 }}>por kg</span>
+          </p>
+          <p>
+            De {oferta.buyer?.full_name ?? "un comprador"}. Aceptaron {aceptaron} de {productores.length} productores.
+          </p>
+          {esProductor && misLotesEnVenta.length > 0 && yoRespondi === null ? (
+            <Link href={`/ventas-conjuntas/${venta.id}/oferta`} className="btn" style={{ background: "var(--blanco)", color: "var(--negro)" }}>
+              Ver la oferta y responder
+              <IconArrowRight size={22} strokeWidth={2.4} />
+            </Link>
+          ) : null}
+        </section>
+      ) : null}
+
+      {venta.status === "cerrado" && ultimaOferta ? (
+        <p className="alert alert-ok">
+          Venta cerrada a {fmtMoney(Number(ultimaOferta.price_per_kg))} por kg con {ultimaOferta.buyer?.full_name ?? "el comprador"}.
+        </p>
+      ) : null}
+
+      <section className="card rows">
+        <h3 style={{ marginTop: 12 }}>{oferta ? "Participantes y respuesta a la oferta" : "Lotes en la venta"}</h3>
+        {venta.members.length === 0 ? <p className="small" style={{ padding: "8px 0" }}>Todavía no hay lotes. ¡Sumá el primero!</p> : null}
+        {venta.members.map((m) => {
+          const mio = m.lot?.producer_id === perfil.id;
+          const conf = oferta?.confirmations?.find((c) => c.producer_id === m.lot?.producer_id);
+          return (
+            <div key={m.id} className="kv-row" style={{ alignItems: "center", ...(mio ? { background: "#fff6e0", margin: "0 -18px", padding: "11px 18px" } : {}) }}>
+              <span style={{ color: "var(--negro)" }}>
+                <strong>{m.lot?.farm?.name ?? "Establecimiento"}</strong>
+                {mio ? <span className="tag" style={{ background: "var(--marron)", color: "var(--blanco)", marginLeft: 6 }}>Vos</span> : null}
+                <br />
+                <span className="small">
+                  {m.lot?.farm?.zone} · {fmtInt(m.lot?.head_count ?? 0)} {categoryLabel(venta.category).toLowerCase()} · {fmtKg(Number(m.lot?.average_weight_kg ?? 0))} prom.
+                </span>
+              </span>
+              {oferta ? <AnswerTag accepted={conf ? conf.accepted : null} /> : <strong>{fmtInt(m.lot?.head_count ?? 0)}</strong>}
+            </div>
+          );
+        })}
+        <div className="kv-row">
+          <strong>Total</strong>
+          <strong>
+            {fmtInt(venta.current_heads)} cabezas · ≈ {fmtKg(pesoTotal)}
+          </strong>
+        </div>
+      </section>
+      <p className="small">Solo mostramos el establecimiento y la localidad. Los datos personales no se comparten.</p>
+
+      {esProductor && venta.status === "abierto" ? (
+        sumables.length > 0 ? (
+          <SumarForm poolId={venta.id} lotes={sumables} />
+        ) : misLotesEnVenta.length === 0 ? (
+          <p className="card note">
+            Para sumarte necesitás un lote disponible de {categoryLabel(venta.category).toLowerCase()} en {venta.zone} que entre en lo que falta.{" "}
+            <Link href="/mis-lotes/nuevo">Registrar un lote</Link>
+          </p>
+        ) : null
+      ) : null}
+
+      {esProductor && misLotesEnVenta.length > 0 && ["abierto", "objetivo_alcanzado"].includes(venta.status)
+        ? misLotesEnVenta.map((l) => <SalirForm key={l.id} poolId={venta.id} lotId={l.id} label={l.title} />)
+        : null}
+
+      {esComprador && venta.status === "objetivo_alcanzado" ? (
+        <OfertarForm poolId={venta.id} cabezas={venta.current_heads} pesoTotal={pesoTotal} />
+      ) : null}
+      {esComprador && venta.status === "abierto" ? (
+        <p className="card note">Cuando la venta llegue a las {fmtInt(venta.target_heads)} cabezas vas a poder ofertar.</p>
+      ) : null}
+
+      {esOperador && oferta && aceptaron === productores.length && productores.length > 0 ? (
+        <CerrarVenta poolId={venta.id} />
+      ) : null}
+
+      <Link href={`/flete?cabezas=${venta.current_heads}&venta=${venta.id}`} className="link-btn" style={{ justifyContent: "center" }}>
+        <IconTruck size={22} />
+        Calcular flete estimado para esta venta
+      </Link>
+      <Link
+        href={`/mensajes/nueva?venta=${venta.id}&asunto=${encodeURIComponent(`Consulta sobre ${venta.title}`)}`}
+        className="btn btn-s"
+      >
+        <IconChat size={24} strokeWidth={2.4} />
+        {esComprador ? "Enviar una consulta" : "Tengo una duda: escribir al grupo"}
+      </Link>
+      <p className="small" style={{ textAlign: "center" }}>
+        Las consultas llegan al martillero y a los productores de esta venta, dentro de YvyTape.
+      </p>
+    </AppShell>
+  );
+}
