@@ -19,7 +19,7 @@ export default async function IngresarPage() {
         </Link>
       </header>
       <main className="page">
-        <h1 style={{ fontSize: 34 }}>Entrá a YvyTape</h1>
+        <h1 style={{ fontSize: 27 }}>Entrá a YvyTape</h1>
         <IngresarForm />
         <div style={{ display: "flex", alignItems: "center", gap: 12, color: "var(--texto-apoyo)" }}>
           <span style={{ flex: 1, height: 2, background: "var(--borde)" }} />
@@ -32,7 +32,7 @@ export default async function IngresarPage() {
         <Link href="/registrarse?rol=comprador" className="btn btn-s">
           Crear cuenta de comprador
         </Link>
-        <p className="card note" style={{ fontSize: 17 }}>
+        <p className="card note" style={{ fontSize: 15 }}>
           Si te ayuda un familiar, puede crear la cuenta con tus datos. En YvyTape no pedimos ni mostramos tu teléfono: todo se habla por Mensajes.
         </p>
       </main>

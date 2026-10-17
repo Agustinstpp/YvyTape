@@ -1,3 +1,5 @@
+// TODO(geo): YvyMap y FreightCalculator usan textos de 11–15px y paleta gris/verde; pasar a 17px mínimo y colores de marca.
+// TODO(geo): si no hay datos reales, getMapOffers muestra DEMO_MAP_OFFERS sin aviso; marcarlo como demostración.
 import Link from "next/link";
 import { getSessionProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";

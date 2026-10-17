@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { mismaZona } from "@/lib/front/zonas";
 import { requireProfile } from "@/lib/session";
 import { AppShell } from "@/components/app-shell";
 import { HeadsProgress, PoolStatusTag, Empty } from "@/components/ui";
@@ -20,12 +21,12 @@ export default async function VentasPage({
   const participo = new Set(ventas.map((v) => v.pool.id));
   const cat = CATEGORIES.includes(categoria as LivestockCategory) ? (categoria as LivestockCategory) : null;
 
-  const misZonas = new Set(lotes.map((l) => l.farm?.zone?.toLowerCase()).filter(Boolean));
+  const misZonas = lotes.map((l) => l.farm?.zone).filter(Boolean) as string[];
   let lista: PoolSummary[] =
     ver === "mias" ? todas.filter((p) => participo.has(p.id)) : todas.filter((p) => p.status !== "cancelado");
   if (cat) lista = lista.filter((p) => p.category === cat);
-  if (ver !== "mias" && ver !== "todas" && misZonas.size > 0) {
-    const cerca = lista.filter((p) => misZonas.has(p.zone.toLowerCase()) || participo.has(p.id));
+  if (ver !== "mias" && ver !== "todas" && misZonas.length > 0) {
+    const cerca = lista.filter((p) => misZonas.some((z) => mismaZona(z, p.zone)) || participo.has(p.id));
     if (cerca.length) lista = cerca;
   }
 
@@ -62,7 +63,7 @@ export default async function VentasPage({
       ) : (
         lista.map((p) => (
           <Link key={p.id} href={`/ventas-conjuntas/${p.id}`} className="card">
-            <h2 style={{ fontSize: 22 }}>{p.title}</h2>
+            <h2 style={{ fontSize: 19 }}>{p.title}</h2>
             <span className="small" style={{ display: "flex", gap: 6, alignItems: "center" }}>
               <IconPin size={20} />
               {categoryLabel(p.category)} · {p.zone} · {p.members_count} {p.members_count === 1 ? "lote" : "lotes"}

@@ -9,7 +9,7 @@ export default function NotFound() {
         <h1>YvyTape</h1>
       </header>
       <main className="page">
-        <h2 style={{ fontSize: 30 }}>No encontramos esta página</h2>
+        <h2 style={{ fontSize: 24 }}>No encontramos esta página</h2>
         <p>Puede que la venta o el lote ya no estén disponibles.</p>
         <Link href="/" className="btn btn-p">
           Volver al inicio

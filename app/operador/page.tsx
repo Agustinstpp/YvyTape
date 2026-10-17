@@ -23,7 +23,7 @@ export default async function OperadorPage() {
       {lista.length === 0 ? <Empty title="Todavía no hay ventas conjuntas" /> : null}
       {lista.map((p) => (
         <Link key={p.id} href={`/ventas-conjuntas/${p.id}`} className="card">
-          <h2 style={{ fontSize: 22 }}>{p.title}</h2>
+          <h2 style={{ fontSize: 19 }}>{p.title}</h2>
           <span className="small">
             {categoryLabel(p.category)} · {p.zone} · {p.members_count} lotes
           </span>

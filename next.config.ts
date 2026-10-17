@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// TODO(geo): sacar estos redirects cuando el mapa enlace a /ofertas/lote/:id y /ventas-conjuntas/:id.
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,

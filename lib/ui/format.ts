@@ -83,3 +83,12 @@ export function percent(current: number, target: number): number {
   if (!target) return 0;
   return Math.max(0, Math.min(100, Math.round((current / target) * 100)));
 }
+
+/** Número escrito a la argentina o no: "2.850" y "2850" → 2850; "180,5" y "180.5" → 180.5; "2.850,50" → 2850.5. */
+export const parseNumero = (texto: string): number => {
+  let t = texto.replace(/\s|\$/g, "");
+  if (t === "") return NaN;
+  if (t.includes(",")) t = t.replace(/\./g, "").replace(",", ".");
+  else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, "");
+  return Number(t);
+};

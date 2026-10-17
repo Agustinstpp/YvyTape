@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { registrarse } from "@/app/acciones";
-import { FieldError, FormAlert, SubmitButton, type FormState } from "@/components/form-parts";
+import { FieldError, FormAlert, SubmitButton, ZonasDatalist, type FormState } from "@/components/form-parts";
 import { IconCheck } from "@/components/icons";
 
 export function RegistroForm({ rolInicial }: { rolInicial: "productor" | "comprador" }) {
@@ -32,7 +32,8 @@ export function RegistroForm({ rolInicial }: { rolInicial: "productor" | "compra
       </div>
       <div className="field">
         <label htmlFor="zone">Localidad</label>
-        <input id="zone" name="zone" placeholder="Por ejemplo: Curuzú Cuatiá" aria-invalid={!!fe.zone} aria-describedby="e-zone" />
+        <ZonasDatalist />
+        <input id="zone" name="zone" list="zonas" autoComplete="off" placeholder="Por ejemplo: Curuzú Cuatiá" aria-invalid={!!fe.zone} aria-describedby="e-zone" />
         <FieldError id="e-zone" message={fe.zone} />
       </div>
       <div className="field">

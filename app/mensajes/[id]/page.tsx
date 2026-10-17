@@ -17,7 +17,7 @@ export default async function ConversacionPage({ params }: { params: Promise<{ i
 
   return (
     <AppShell title={conv.asunto} subtitle={conv.contexto} back={{ href: "/mensajes", label: "Volver a mensajes" }} perfil={perfil} current="mensajes">
-      <p className="alert alert-info" style={{ fontSize: 17 }}>
+      <p className="alert alert-info" style={{ fontSize: 15 }}>
         <IconLock size={22} />
         Todo queda en YvyTape. No se pueden compartir teléfonos, correos ni enlaces.
       </p>

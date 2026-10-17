@@ -31,6 +31,7 @@ export interface Aviso {
  * El listado de pools no trae los miembros, así que se consulta el detalle de cada uno
  * (alcanza para el volumen de la demo).
  */
+// TODO(backend): falta "mis ventas conjuntas" (pools con mis lotes) y "mis ofertas" del comprador; hoy se recorren todas.
 export async function ventasDelProductor(perfil: Profile): Promise<{
   lotes: LivestockLotWithFarm[];
   ventas: VentaDelProductor[];

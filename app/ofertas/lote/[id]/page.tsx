@@ -12,6 +12,7 @@ export const metadata = { title: "Lote · YvyTape" };
 export default async function LotePage({ params }: { params: Promise<{ id: string }> }) {
   const perfil = await getSessionProfile();
   const { id } = await params;
+  // TODO(backend): falta getLotById. Un lote ya reservado en una venta da 404 (por ejemplo desde el mapa).
   // El backend no tiene una consulta por id: se busca entre los lotes disponibles.
   const { data: lotes } = await getAvailableLots();
   const lote = (lotes ?? []).find((l) => l.id === id);
@@ -22,17 +23,17 @@ export default async function LotePage({ params }: { params: Promise<{ id: strin
   return (
     <AppShell title="Detalle del lote" back={{ href: "/ofertas", label: "Volver a ofertas" }} perfil={perfil} current="ofertas">
       <SaleSeal kind="individual" />
-      <h2 style={{ fontSize: 30 }}>{lote.title}</h2>
+      <h2 style={{ fontSize: 24 }}>{lote.title}</h2>
 
       <div className="stats">
-        <div className="stat"><span>Categoría</span><b style={{ fontSize: 26 }}>{categoryLabel(lote.category)}</b></div>
-        <div className="stat"><span>Cantidad</span><b style={{ fontSize: 26 }}>{fmtInt(lote.head_count)}</b></div>
+        <div className="stat"><span>Categoría</span><b style={{ fontSize: 22 }}>{categoryLabel(lote.category)}</b></div>
+        <div className="stat"><span>Cantidad</span><b style={{ fontSize: 22 }}>{fmtInt(lote.head_count)}</b></div>
         <div className="stat">
           <span>Peso promedio</span>
-          <b style={{ fontSize: 26 }}>{fmtKg(Number(lote.average_weight_kg))}</b>
+          <b style={{ fontSize: 22 }}>{fmtKg(Number(lote.average_weight_kg))}</b>
           <span className="tag tag-declarado" style={{ alignSelf: "flex-start" }}>Declarado</span>
         </div>
-        <div className="stat"><span>Raza</span><b style={{ fontSize: 26 }}>{lote.breed}</b></div>
+        <div className="stat"><span>Raza</span><b style={{ fontSize: 22 }}>{lote.breed}</b></div>
       </div>
 
       <section className="card rows">

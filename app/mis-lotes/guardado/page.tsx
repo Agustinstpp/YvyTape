@@ -22,8 +22,8 @@ export default async function LoteGuardadoPage({ searchParams }: { searchParams:
         <div style={{ width: 96, height: 96, borderRadius: 999, background: "var(--exito-fondo)", color: "var(--exito)", display: "flex", alignItems: "center", justifyContent: "center", alignSelf: "center" }}>
           <IconCheck size={56} strokeWidth={2.6} />
         </div>
-        <h1 style={{ textAlign: "center", fontSize: 34 }}>Lote guardado</h1>
-        <p style={{ textAlign: "center", fontSize: 20 }}>
+        <h1 style={{ textAlign: "center", fontSize: 27 }}>Lote guardado</h1>
+        <p style={{ textAlign: "center", fontSize: 17 }}>
           Ya está en <strong>Mis lotes</strong> y los compradores lo pueden ver.
         </p>
         {lote ? (
@@ -36,7 +36,7 @@ export default async function LoteGuardadoPage({ searchParams }: { searchParams:
         ) : null}
         {cerca.length > 0 ? (
           <section className="card highlight">
-            <h2 style={{ fontSize: 22 }}>¿Y ahora?</h2>
+            <h2 style={{ fontSize: 19 }}>¿Y ahora?</h2>
             <p>
               Hay {cerca.length === 1 ? "1 venta conjunta" : `${cerca.length} ventas conjuntas`} de {categoryLabel(lote!.category).toLowerCase()} cerca tuyo. Sumate para llegar a un comprador más grande.
             </p>

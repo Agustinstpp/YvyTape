@@ -1,8 +1,10 @@
 "use client";
 
+// TODO(backend): campos del mockup que no existen en la base: rinde estimado, precio pretendido, fotos,
+//   documentación de tránsito/sanidad. Tampoco hay destino de la venta (invernada o faena) para el ciclo cría → invernada → faena.
 import { useActionState, useState } from "react";
 import { registrarLote } from "@/app/acciones";
-import { FieldError, FormAlert, SubmitButton, type FormState } from "@/components/form-parts";
+import { FieldError, FormAlert, SubmitButton, ZonasDatalist, type FormState } from "@/components/form-parts";
 import { IconArrowLeft, IconArrowRight, IconCheck, IconInfo } from "@/components/icons";
 import { CATEGORIES, categoryLabel } from "@/lib/ui/format";
 
@@ -49,7 +51,7 @@ export function LoteForm({ farms, zonaPerfil }: { farms: Farm[]; zonaPerfil: str
 
       {/* Paso 1: establecimiento */}
       <section className="stack" style={{ ...ver(0), gap: 14 }}>
-        {enRevision ? <h2 style={{ fontSize: 22 }}>Establecimiento</h2> : <h2 style={{ fontSize: 28 }}>¿En qué campo están los animales?</h2>}
+        {enRevision ? <h2 style={{ fontSize: 19 }}>Establecimiento</h2> : <h2 style={{ fontSize: 23 }}>¿En qué campo están los animales?</h2>}
         {farms.length > 0 ? (
           <div className="field">
             <label htmlFor="farm_id">Establecimiento</label>
@@ -74,7 +76,8 @@ export function LoteForm({ farms, zonaPerfil }: { farms: Farm[]; zonaPerfil: str
             </div>
             <div className="field">
               <label htmlFor="farm_zone">Localidad</label>
-              <input id="farm_zone" name="farm_zone" defaultValue={zonaPerfil} aria-invalid={!!fe.farm_zone} aria-describedby="h-farm_zone e-farm_zone" />
+              <ZonasDatalist />
+              <input id="farm_zone" name="farm_zone" list="zonas" autoComplete="off" defaultValue={zonaPerfil} aria-invalid={!!fe.farm_zone} aria-describedby="h-farm_zone e-farm_zone" />
               <span id="h-farm_zone" className="help">Las ventas conjuntas se arman entre lotes de la misma zona.</span>
               <FieldError id="e-farm_zone" message={fe.farm_zone} />
             </div>
@@ -84,7 +87,7 @@ export function LoteForm({ farms, zonaPerfil }: { farms: Farm[]; zonaPerfil: str
 
       {/* Paso 2: categoría y raza */}
       <section className="stack" style={{ ...ver(1), gap: 14 }}>
-        {enRevision ? <h2 style={{ fontSize: 22 }}>Categoría y raza</h2> : <h2 style={{ fontSize: 28 }}>¿Qué animales son?</h2>}
+        {enRevision ? <h2 style={{ fontSize: 19 }}>Categoría y raza</h2> : <h2 style={{ fontSize: 23 }}>¿Qué animales son?</h2>}
         <fieldset className="field" style={{ border: 0, padding: 0, margin: 0 }} aria-describedby="e-category">
           <legend className="label" style={{ marginBottom: 6 }}>Categoría</legend>
           <div className="choices">
@@ -106,7 +109,7 @@ export function LoteForm({ farms, zonaPerfil }: { farms: Farm[]; zonaPerfil: str
 
       {/* Paso 3: cantidad y peso */}
       <section className="stack" style={{ ...ver(2), gap: 14 }}>
-        {enRevision ? <h2 style={{ fontSize: 22 }}>Cantidad y peso</h2> : <h2 style={{ fontSize: 28 }}>¿Cuántos animales y cuánto pesan?</h2>}
+        {enRevision ? <h2 style={{ fontSize: 19 }}>Cantidad y peso</h2> : <h2 style={{ fontSize: 23 }}>¿Cuántos animales y cuánto pesan?</h2>}
         <div className="field">
           <label htmlFor="head_count">Cantidad de cabezas</label>
           <input id="head_count" name="head_count" inputMode="numeric" aria-invalid={!!fe.head_count} aria-describedby="e-head_count" />

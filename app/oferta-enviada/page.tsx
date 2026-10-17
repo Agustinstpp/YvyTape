@@ -20,8 +20,8 @@ export default async function OfertaEnviadaPage({ searchParams }: { searchParams
       <div style={{ width: 96, height: 96, borderRadius: 999, background: "var(--exito-fondo)", color: "var(--exito)", display: "flex", alignItems: "center", justifyContent: "center", alignSelf: "center" }}>
         <IconCheck size={56} strokeWidth={2.6} />
       </div>
-      <h2 style={{ fontSize: 34, textAlign: "center" }}>Oferta enviada</h2>
-      <p style={{ fontSize: 20, textAlign: "center" }}>Cada productor acepta o rechaza su parte. Te avisamos en YvyTape cuando respondan.</p>
+      <h2 style={{ fontSize: 27, textAlign: "center" }}>Oferta enviada</h2>
+      <p style={{ fontSize: 17, textAlign: "center" }}>Cada productor acepta o rechaza su parte. Te avisamos en YvyTape cuando respondan.</p>
       {venta && oferta ? (
         <>
           <section className="card rows">
@@ -30,7 +30,7 @@ export default async function OfertaEnviadaPage({ searchParams }: { searchParams
             <div className="kv-row"><span>Cantidad</span><span>{fmtInt(venta.current_heads)} {categoryLabel(venta.category).toLowerCase()}</span></div>
           </section>
           <section className="card">
-            <strong style={{ fontSize: 22 }}>
+            <strong style={{ fontSize: 19 }}>
               {respondieron} de {productores} productores respondieron
             </strong>
             <div className="bar" role="img" aria-label={`${respondieron} de ${productores} productores respondieron`}>

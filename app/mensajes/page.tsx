@@ -26,7 +26,7 @@ export default async function MensajesPage() {
                 {a.urgente ? <IconBell size={28} /> : <IconCheck size={28} strokeWidth={2.6} />}
               </span>
               <span style={{ flex: 1 }}>
-                <strong style={{ fontSize: 20 }}>{a.titulo}</strong>
+                <strong style={{ fontSize: 17 }}>{a.titulo}</strong>
                 <br />
                 {a.texto}
               </span>
@@ -48,7 +48,7 @@ export default async function MensajesPage() {
             <IconChat size={28} />
           </span>
           <span style={{ flex: 1, minWidth: 0 }}>
-            <strong style={{ fontSize: 20 }}>{c.asunto}</strong>
+            <strong style={{ fontSize: 17 }}>{c.asunto}</strong>
             <br />
             <span className="small">{c.contexto}</span>
             {c.ultimo ? (

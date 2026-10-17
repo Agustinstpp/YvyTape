@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { crearVenta } from "@/app/acciones";
-import { FormAlert, SubmitButton, type FormState } from "@/components/form-parts";
+import { FormAlert, SubmitButton, ZonasDatalist, type FormState } from "@/components/form-parts";
 import { IconCheck } from "@/components/icons";
 import { CATEGORIES, categoryLabel } from "@/lib/ui/format";
 
@@ -24,7 +24,8 @@ export function NuevaVentaForm({ zona }: { zona: string }) {
       </fieldset>
       <div className="field">
         <label htmlFor="zone">Zona</label>
-        <input id="zone" name="zone" defaultValue={zona} required />
+        <ZonasDatalist />
+        <input id="zone" name="zone" list="zonas" autoComplete="off" defaultValue={zona} required />
         <span className="help">Solo se pueden sumar lotes de esta zona.</span>
       </div>
       <div className="field">

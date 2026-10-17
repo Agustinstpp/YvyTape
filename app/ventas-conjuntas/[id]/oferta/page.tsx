@@ -31,12 +31,12 @@ export default async function ResponderOfertaPage({ params }: { params: Promise<
         <IconBell size={22} />
         Te llegó un aviso en YvyTape
       </p>
-      <h2 style={{ fontSize: 32 }}>¿Aceptás esta oferta?</h2>
+      <h2 style={{ fontSize: 26 }}>¿Aceptás esta oferta?</h2>
 
       <section className="card highlight">
         <span style={{ fontWeight: 700 }}>Precio ofrecido</span>
-        <span style={{ fontSize: 40, lineHeight: 1.1, fontWeight: 800 }}>
-          {fmtMoney(precio)} <span style={{ fontSize: 22 }}>por kg</span>
+        <span style={{ fontSize: 32, lineHeight: 1.1, fontWeight: 800 }}>
+          {fmtMoney(precio)} <span style={{ fontSize: 19 }}>por kg</span>
         </span>
         <span>
           De {oferta.buyer?.full_name ?? "un comprador"} para «{venta.title}»
@@ -51,7 +51,7 @@ export default async function ResponderOfertaPage({ params }: { params: Promise<
         <div className="kv-row"><span>Comisión, flete y carga</span><span>Los coordina el martillero por Mensajes</span></div>
       </section>
 
-      <p className="card note" style={{ fontSize: 17 }}>
+      <p className="card note" style={{ fontSize: 15 }}>
         La venta se cierra solo si aceptan los {productores} productores. Si alguien no acepta, esta oferta se cae y la venta sigue abierta a otras ofertas.
       </p>
 

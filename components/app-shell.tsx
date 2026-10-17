@@ -44,6 +44,8 @@ type ShellProps = {
 };
 
 /** Barra superior marrón + contenido + menú inferior según el rol. */
+// TODO(perf): en cada pantalla del productor se calculan los avisos pidiendo el detalle de TODAS las ventas (N+1).
+//   Con un endpoint de "mis ventas" o de avisos del backend se resuelve.
 export async function AppShell({ title, subtitle, back, perfil, current, children }: ShellProps) {
   let unread = 0;
   if (perfil) {

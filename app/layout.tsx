@@ -13,6 +13,10 @@ export const viewport: Viewport = {
   themeColor: "#6B3E26",
 };
 
+// Aviso para desarrollo: sin Supabase configurado los botones parecen no hacer nada.
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const sinSupabase = !url || url.includes("your-project-ref") || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.startsWith("eyJ") || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.endsWith("...");
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es-AR">
@@ -25,7 +29,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700;800&display=swap"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {sinSupabase ? (
+          <p role="alert" style={{ margin: 0, padding: "10px 16px", background: "var(--error-fondo)", color: "var(--error)", fontWeight: 700, textAlign: "center" }}>
+            Falta configurar Supabase: completá NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local y reiniciá npm run dev.
+            Sin eso no se puede ingresar ni ver datos.
+          </p>
+        ) : null}
+        {children}
+      </body>
     </html>
   );
 }

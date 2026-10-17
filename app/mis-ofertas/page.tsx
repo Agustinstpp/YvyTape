@@ -32,11 +32,11 @@ export default async function MisOfertasPage() {
           const aceptaron = o.confirmations?.filter((c) => c.accepted).length ?? 0;
           return (
             <Link key={v.id} href={`/ventas-conjuntas/${v.id}`} className="card">
-              <h2 style={{ fontSize: 22 }}>{v.title}</h2>
+              <h2 style={{ fontSize: 19 }}>{v.title}</h2>
               <p>
                 {fmtInt(v.current_heads)} {categoryLabel(v.category).toLowerCase()} · {v.zone}
               </p>
-              <p style={{ fontSize: 24, fontWeight: 800 }}>{fmtMoney(Number(o.price_per_kg))} por kg</p>
+              <p style={{ fontSize: 20, fontWeight: 800 }}>{fmtMoney(Number(o.price_per_kg))} por kg</p>
               <p className="small">
                 Aceptaron {aceptaron} de {productores} productores
               </p>

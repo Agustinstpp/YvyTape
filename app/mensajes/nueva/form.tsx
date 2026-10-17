@@ -13,7 +13,7 @@ export function NuevaConsultaForm(props: { poolId: string; lotId: string; asunto
 
   return (
     <form action={action} className="stack" style={{ gap: 16 }}>
-      <p className="alert alert-info" style={{ fontSize: 17 }}>
+      <p className="alert alert-info" style={{ fontSize: 15 }}>
         <IconLock size={22} />
         Todo queda en YvyTape. No se pueden compartir teléfonos, correos ni enlaces.
       </p>

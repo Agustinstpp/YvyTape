@@ -29,7 +29,7 @@ export default async function InicioPage() {
     <AppShell title={`Hola, ${perfil.full_name}`} subtitle={perfil.zone ?? undefined} perfil={perfil} current="inicio">
       {urgentes.map((a) => (
         <Link key={a.id} href={a.href} className="card accent">
-          <span style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 800, fontSize: 22 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 800, fontSize: 19 }}>
             <IconBell size={28} />
             {a.titulo}
           </span>
@@ -48,14 +48,14 @@ export default async function InicioPage() {
         <Link href="/ventas-conjuntas?ver=mias" className="stat"><b>{fmtInt(activos)}</b>Ventas conjuntas activas</Link>
       </div>
 
-      <Link href="/mis-lotes/nuevo" className="btn btn-p" style={{ minHeight: 64, fontSize: 21 }}>
+      <Link href="/mis-lotes/nuevo" className="btn btn-p" style={{ minHeight: 64, fontSize: 18 }}>
         <IconPlus size={26} strokeWidth={2.4} />
         Registrar lote
       </Link>
 
       {sugerida ? (
         <section className="card">
-          <h2 style={{ fontSize: 22 }}>Cerca tuyo</h2>
+          <h2 style={{ fontSize: 19 }}>Cerca tuyo</h2>
           <p>
             Hay una venta conjunta de <strong>{categoryLabel(sugerida.category).toLowerCase()}</strong> en {sugerida.zone} que necesita{" "}
             {fmtInt(Math.max(0, sugerida.target_heads - sugerida.current_heads))} cabezas más.

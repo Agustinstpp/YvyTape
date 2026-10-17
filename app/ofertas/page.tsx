@@ -82,7 +82,7 @@ export default async function OfertasPage({
       {ventas.map((p) => (
         <Link key={p.id} href={`/ventas-conjuntas/${p.id}`} className="card">
           <SaleSeal kind="conjunta" producers={p.members_count} />
-          <h2 style={{ fontSize: 22 }}>{p.title}</h2>
+          <h2 style={{ fontSize: 19 }}>{p.title}</h2>
           <span className="small" style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <IconPin size={20} />
             {categoryLabel(p.category)} · {p.zone}
@@ -95,10 +95,10 @@ export default async function OfertasPage({
       {individuales.map((l) => (
         <Link key={l.id} href={`/ofertas/lote/${l.id}`} className="card">
           <SaleSeal kind="individual" />
-          <h2 style={{ fontSize: 22 }}>
+          <h2 style={{ fontSize: 19 }}>
             {categoryLabel(l.category)} · {l.breed}
           </h2>
-          <p style={{ fontSize: 24, fontWeight: 800 }}>
+          <p style={{ fontSize: 20, fontWeight: 800 }}>
             {fmtInt(l.head_count)} {categoryLabel(l.category, l.head_count !== 1).toLowerCase()}
           </p>
           <span className="small">{fmtKg(Number(l.average_weight_kg))} prom. (declarado)</span>

@@ -21,13 +21,13 @@ export default async function MisLotesPage() {
     return (
       <article className="card">
         <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
-          <h2 style={{ fontSize: 22 }}>
+          <h2 style={{ fontSize: 19 }}>
             {categoryLabel(lote.category)} · {lote.breed}
           </h2>
           <LotStatusTag status={lote.status} />
         </div>
         <p>
-          <strong style={{ fontSize: 24 }}>{fmtInt(lote.head_count)}</strong> cabezas · {fmtKg(Number(lote.average_weight_kg))} promedio (declarado)
+          <strong style={{ fontSize: 20 }}>{fmtInt(lote.head_count)}</strong> cabezas · {fmtKg(Number(lote.average_weight_kg))} promedio (declarado)
         </p>
         <p className="small" style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <IconPin size={20} />

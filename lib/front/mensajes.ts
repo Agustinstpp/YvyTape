@@ -104,6 +104,9 @@ function sembrar(perfil: Profile) {
   });
 }
 
+// TODO(backend): mensajería real (tablas conversaciones/mensajes + RLS). Este adaptador vive en memoria:
+//   se borra al reiniciar y en Vercel cada instancia tiene su copia, así que no sirve para producción.
+// TODO(backend): repetir en el servidor el filtro de contactos (teléfonos, correos, enlaces).
 const demoAdapter: MensajesAdapter = {
   esDemo: true,
 

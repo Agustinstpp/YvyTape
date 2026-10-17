@@ -2,6 +2,18 @@
 
 import { useFormStatus } from "react-dom";
 import { IconAlert, IconCheck } from "@/components/icons";
+import { ZONAS } from "@/lib/front/zonas";
+
+/** Sugerencias de localidades del catálogo; se usa con <input list="zonas">. */
+export function ZonasDatalist() {
+  return (
+    <datalist id="zonas">
+      {ZONAS.map((z) => (
+        <option key={z} value={z} />
+      ))}
+    </datalist>
+  );
+}
 
 /** Estado que devuelven las acciones de formulario. */
 export type FormState = { error?: string; ok?: string; fieldErrors?: Record<string, string> } | null;

@@ -15,13 +15,11 @@ import { getSessionProfile, homeFor } from "@/lib/session";
 import { mensajes } from "@/lib/front/mensajes";
 import type { FormState } from "@/components/form-parts";
 import type { LivestockCategory } from "@/lib/types/domain";
-import { CATEGORIES } from "@/lib/ui/format";
+import { CATEGORIES, categoryLabel, parseNumero } from "@/lib/ui/format";
+import { canonZona } from "@/lib/front/zonas";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
-const num = (fd: FormData, k: string) => {
-  const raw = str(fd, k).replace(/\./g, "").replace(",", ".");
-  return raw === "" ? NaN : Number(raw);
-};
+const num = (fd: FormData, k: string) => parseNumero(str(fd, k));
 
 // ------------------------------------------------------------------ sesión
 export async function ingresar(_: FormState, fd: FormData): Promise<FormState> {
@@ -37,7 +35,7 @@ export async function ingresar(_: FormState, fd: FormData): Promise<FormState> {
 
 export async function registrarse(_: FormState, fd: FormData): Promise<FormState> {
   const full_name = str(fd, "full_name");
-  const zone = str(fd, "zone");
+  const zone = canonZona(str(fd, "zone"));
   const email = str(fd, "email");
   const password = str(fd, "password");
   const role = str(fd, "role") === "comprador" ? "comprador" : "productor";
@@ -48,6 +46,8 @@ export async function registrarse(_: FormState, fd: FormData): Promise<FormState
   if (password.length < 8) fieldErrors.password = "La contraseña tiene que tener 8 letras o números como mínimo.";
   if (Object.keys(fieldErrors).length) return { error: "Revisá los datos marcados.", fieldErrors };
 
+  // TODO(backend): el rol se toma de la metadata del signUp; cualquiera puede llamar a signUp con role "operador".
+  //   El trigger handle_new_user debería aceptar solo productor/comprador.
   const supabase = await createClient();
   // No se pide teléfono: toda la comunicación queda dentro de YvyTape.
   const { data, error } = await supabase.auth.signUp({
@@ -90,12 +90,12 @@ export async function registrarLote(_: FormState, fd: FormData): Promise<FormSta
   if (Object.keys(fieldErrors).length) return { error: "Falta corregir algunos datos para seguir.", fieldErrors };
 
   if (!farm_id || farm_id === "nuevo") {
-    const farm = await createFarm({ name: str(fd, "farm_name"), zone: str(fd, "farm_zone") });
+    const farm = await createFarm({ name: str(fd, "farm_name"), zone: canonZona(str(fd, "farm_zone")) });
     if (farm.error || !farm.data) return { error: farm.error?.message ?? "No pudimos guardar el establecimiento." };
     farm_id = farm.data.id;
   }
 
-  const title = str(fd, "title") || `${head_count} ${category} ${breed}`;
+  const title = str(fd, "title") || `${head_count} ${categoryLabel(category, head_count !== 1).toLowerCase()} ${breed}`;
   const res = await createLot({
     farm_id,
     title,
@@ -120,12 +120,12 @@ export async function tieneEstablecimientos(): Promise<boolean> {
 export async function crearVenta(_: FormState, fd: FormData): Promise<FormState> {
   const category = str(fd, "category") as LivestockCategory;
   const target_heads = num(fd, "target_heads");
-  const zone = str(fd, "zone");
+  const zone = canonZona(str(fd, "zone"));
   const title = str(fd, "title");
   if (!CATEGORIES.includes(category)) return { error: "Elegí la categoría." };
   if (!Number.isInteger(target_heads) || target_heads <= 0) return { error: "Escribí el objetivo de cabezas con números." };
   if (zone.length < 2) return { error: "Escribí la zona." };
-  const res = await createPool({ title: title || `Venta de ${category} en ${zone}`, zone, category, target_heads });
+  const res = await createPool({ title: title || `Venta de ${categoryLabel(category, true).toLowerCase()} en ${zone}`, zone, category, target_heads });
   if (res.error || !res.data) return { error: res.error?.message ?? "No pudimos crear la venta conjunta." };
   revalidatePath("/ventas-conjuntas");
   redirect(`/ventas-conjuntas/${res.data.id}`);
@@ -178,6 +178,7 @@ export async function cerrarVenta(_: FormState, fd: FormData): Promise<FormState
   if (res.error) return { error: res.error.message };
   revalidatePath("/operador");
   revalidatePath(`/ventas-conjuntas/${poolId}`);
+  // TODO(backend): al cerrar, avisar automáticamente a comprador y productores (hoy el martillero lo hace a mano).
   return { ok: "Venta cerrada. Avisale a las partes por Mensajes." };
 }
 
